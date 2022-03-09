@@ -1,45 +1,85 @@
 '''
 Author: Nathan Hines 21523561
 Pledge of Honour: I pledge by honour that this program is solely my own work.
-Description: Display formatted text using user inputs.
+Description: Display formatted text using OUT inputs.
 '''
+from colorama import init, Fore
 
+# Constants for colors
+ERROR = Fore.RED
+OUT = Fore.YELLOW
+RESET = Fore.RESET
+
+# Function to get user input
 def get_worker_values():
-    inputPrints = ["Weekday hours worked: ", "Weekend hours worked: ", "Weekday pay rate: "]
-    while True:
-        for i in inputPrints:
-            try: # Checks values of ALL inputs with only one loop! Yay! Increased memory usage but much better UX!
-                value = float(input(i))
-                pass
-            except ValueError:
-                print("\nError: Invalid input. Try again.\n")
-                continue
+    INPUT_PRINTS = [f"{OUT}Weekday hours worked: {RESET}", f"{OUT}Weekend hours worked: {RESET}", f"{OUT}Weekday pay rate: {RESET}$"]
+    inputsDone = [False, False, False]
 
-            if i == inputPrints[0]:
-                weekdaysWorked = value
-                continue
-                if weekdaysWorked > 120:
-                    print("\nError: Too many weekday hours. Try again.\n")
+    for i in range(len(INPUT_PRINTS)): # Only needs one while loop! Yay! Better UX!
+        while sum(inputsDone) != len(inputsDone):
+            if inputsDone[i] == False:
+                try:
+                    value = float(input(INPUT_PRINTS[i]))
+                except ValueError:
+                    print(f"\n{ERROR}Error: Not a number. Try again\n")
                     continue
-            elif i == inputPrints[1]:
-                weekendsWorked = value
-                continue
-                if weekendsWorked > 48:
-                    print("\nError: Too many weekend hours. Try again.\n")
-                    print("\nError: Values cannot be negative. Try Again.\n")
+
+                if i == 0: # Weekday Hours Item
+                    weekdayHours = value
+                    if weekdayHours > 120:
+                        print(f"\n{ERROR}Error: \'{RESET}Weekday Hours{ERROR}\' cannot be greater than \'{RESET}120.{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    elif weekdayHours < 0:
+                        print(f"\n{ERROR}Error: \'{RESET}Weekday Hours{ERROR}\' cannot be less than \'{RESET}0.{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    else:
+                        inputsDone[i] = True
+                    pass
+
+                elif i == 1: # Weekend Hours Item
+                    weekendHours = value
+                    if weekendHours > 48:
+                        print(f"\n{ERROR}Error: \'{RESET}Weekend Hours{ERROR}\' cannot be greater than \'{RESET}48.{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    elif weekendHours < 0:
+                        print(f"{ERROR}Error: \'{RESET}Weekend Hours{ERROR}\' cannot be less than \'{RESET}0.{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    else:
+                        inputsDone[i] = True
+                    pass
+
+                elif i == 2: # Weekday Pay Item
+                    weekdayPayRate = value
+                    if weekdayPayRate < 20:
+                        print(f"\n{ERROR}Error: \'{RESET}Weekday Pay Rate{ERROR}\' cannot be less than \'{RESET}20 (current minimum wage).{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    else:
+                        inputsDone[i] = True
+                    pass
+
+                else: # In case of some random error
+                    print(f"\n{ERROR}Error: Invalid input item. Try again\n")
                     continue
             else:
                 break
-    calculate_and_display(weekdaysWorked, weekendsWorked, weekdayPayRate, validWeekendPayRate)
+    # Start next function
+    calculate_and_display(weekdayHours, weekendHours, weekdayPayRate)
 
-def calculate_and_display(weekdaysWorked, weekendsWorked, weekdayPayRate, validWeekendPayRate):
-    weekdayPay = weekdaysWorked * weekdayPayRate
-    weekendPay = weekendsWorked * validWeekendPayRate
-    totalPay = weekdayPay + weekendPay
-    print("\nPayment Details:")
-    print(f"\nWeekday pay amount: {weekdayPay:>11.2f}\nWeekend pay amount: {weekendPay:>11.2f}\nTotal: {totalPay:>24.2f}")
+# Function to calculate owed pay and display it
+def calculate_and_display(weekdaysWorked, weekendsWorked, weekdayPayRate):
+    owedWeekdayPay = weekdaysWorked * weekdayPayRate
+    owedWeekendPay = weekendsWorked * (weekdayPayRate * 2)
+    owedTotalPay = owedWeekdayPay + owedWeekendPay
 
-
+    # Print formatted output
+    print(f"\n{OUT}Payment Details:")
+    print(f"\tWeekday pay amount: {RESET}{owedWeekdayPay:>11.2f}\n\t{OUT}Weekend pay amount: {RESET}{owedWeekendPay:>11.2f}\n\t{OUT}Total: {RESET}{owedTotalPay:>24.2f}")
 
 if __name__ == '__main__':
+    init()
     get_worker_values()
