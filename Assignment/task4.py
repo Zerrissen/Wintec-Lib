@@ -4,6 +4,7 @@ Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Display message of the day depending on user inputs.
 '''
 
+# Function to get the users input
 def get_user_input():
     while True:
         try:
@@ -16,7 +17,9 @@ def get_user_input():
             break
     motd(dayNumber)
 
+# Function to print MOTD from user input
 def motd(dayNumber):
+    # Use an iterable here to reduce lines
     messages = ["Unknown day!", "Moody Monday", "Treat-yourself Tuesday", "What is Wednesday?", "This is Thursday!", "Freedom Friday!", "Sad Saturday :(", "Sleepy Sunday"]
     if dayNumber < 1 or dayNumber > 7:
         print(messages[0])
