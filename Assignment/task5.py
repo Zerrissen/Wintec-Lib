@@ -4,41 +4,60 @@ Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Determine grocery discount eligibility
 '''
 
-def get_product_info(): # Function used to get users product values
-    validPrice = []
-    validQuantity = []
-    priceDone = False
-    quantityDone = False
-    while True:
-        try: # Checks values of BOTH inputs with only one loop! Yay!
-            if priceDone == False:
-                itemPrice = float(input("Enter item price: $"))
-                validPrice.append(itemPrice)
-                priceDone = True
-            if quantityDone == False:
-                itemQuantity = int(input("Enter quantity of item: "))
-                validQuantity.append(itemQuantity)
-                quantityDone = True
-            pass
-        except ValueError:
-            print("\nError: Invalid input. Try again.\n")
-            continue
-        if priceDone == False or quantityDone == False:
-            continue
-        else:
-            break
-    #print("Done!") # Used for testing purposes
-    #print(validPrice, validQuantity) # Used for testing purposes
-    get_customer_info(validPrice, validQuantity) # Passes these parameters so calculation can see them without making them global.
+from colorama import init, Fore
 
-def get_customer_info(validPrice, validQuantity): # Function to determine information about the user.
+# Constants for colors
+ERROR = Fore.RED
+OUT = Fore.YELLOW
+RESET = Fore.RESET
+INPUT_PRINTS = [f"{OUT}Enter item price: {RESET}$", f"{OUT}Enter quantity of item: {RESET}"]
+
+# Function used to get users product values
+def get_product_info():
+    inputsDone = [False, False]
+    for i in range(len(INPUT_PRINTS)):
+        while sum(inputsDone) != len(inputsDone):
+            if inputsDone[i] == False:
+                try: # Checks values of BOTH inputs with only one loop! Yay!
+                    value = float(input(INPUT_PRINTS[i]))
+                except ValueError:
+                    print(f"\n{ERROR}Error: Not a number. Try again\n")
+                    continue
+                if i == 0: # Price item
+                    price = value
+                    if price < 0:
+                        print(f"\n{ERROR}Error: \'{RESET}Price{ERROR}\' cannot be less than \'{RESET}0.{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    else:
+                        inputsDone[i] = True
+                        pass
+                elif i == 1: # Quantity item
+                    quantity = value
+                    if quantity < 0:
+                        print(f"\n{ERROR}Error: \'{RESET}Quantity{ERROR}\' cannot be less than \'{RESET}0.{ERROR}\' Try again.\n")
+                        inputsDone[i] = False
+                        continue
+                    else:
+                        inputsDone[i] = True
+                        pass
+                else: # In case of some random error
+                    print(f"\n{ERROR}Error: Unknown Error. Try again\n")
+                    continue
+            else:
+                break
+    #print("Done!") # Used for testing purposes
+    get_customer_info(price, quantity) # Passes these parameters so calculation can see them without making them global.
+
+# Function to determine information about the user.
+def get_customer_info(price, quantity):
     claimed = False
     while True:
         try: # Checks values of input and validates it.
-            customerClaimedDiscount = input("Have you claimed our discount before? (y/n): ")
+            customerClaimedDiscount = input(f"{OUT}Have you claimed our discount before? (y/n): {RESET}")
             pass
         except ValueError:
-            print("\nError: Invalid input. Try again.\n")
+            print(f"\n{ERROR}Error: Invalid input. Try again.\n")
             continue
         if customerClaimedDiscount == "y" or customerClaimedDiscount == "Y":
             claimed = True
@@ -46,19 +65,23 @@ def get_customer_info(validPrice, validQuantity): # Function to determine inform
         elif customerClaimedDiscount == "n" or customerClaimedDiscount == "N":
             claimed = False
             break
-        else:
-            print("\nError: Invalid input. Try again.\n")
+        else: # In case of some random error
+            print("\n{ERROR}Error: Unknown Error. Try again.\n")
             continue
-    calculate_and_output(validPrice, validQuantity, claimed)
+    calculate_and_output(price, quantity, claimed) # Passes parameters again to final function
 
-def calculate_and_output(validPrice, validQuantity, claimed): # Function calculates eligibility using previous given input.
-    totalPriceBeforeDiscount = validPrice[0] * validQuantity[0]
+# Function calculates eligibility using previous given input.
+def calculate_and_output(price, quantity, claimed):
+    totalPriceBeforeDiscount = price * quantity
+
     if claimed == True and totalPriceBeforeDiscount < 500:
-        print(f"\nTotal price: ${totalPriceBeforeDiscount:.2f} \nClaimed discount: " + str(claimed))
-        print("\nYou are eligible for the discount.")
+        print(f"\n{OUT}Total price: {RESET}${totalPriceBeforeDiscount:.2f} \n{OUT}Claimed discount: {RESET}" + str(claimed))
+        print(f"\n{OUT}You are eligible for the discount.")
     else:
-        print(f"\nTotal price: ${totalPriceBeforeDiscount:.2f}\nClaimed discount: " + str(claimed))
-        print("\nYou are not eligible for the discount.")
+        print(f"\n{OUT}Total price: {RESET}${totalPriceBeforeDiscount:.2f}\n{OUT}Claimed discount: {RESET}" + str(claimed))
+        print(F"\n{OUT}You are not eligible for the discount.")
 
-if __name__ == '__main__': # Driver code in the event that the program is used as a module.
+# Driver code in the event that the program is used as a module.
+if __name__ == '__main__':
+    init()
     get_product_info()

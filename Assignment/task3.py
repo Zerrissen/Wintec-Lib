@@ -9,12 +9,11 @@ from colorama import init, Fore
 ERROR = Fore.RED
 OUT = Fore.YELLOW
 RESET = Fore.RESET
+INPUT_PRINTS = [f"{OUT}Weekday hours worked: {RESET}", f"{OUT}Weekend hours worked: {RESET}", f"{OUT}Weekday pay rate: {RESET}$"]
 
 # Function to get user input
 def get_worker_values():
-    INPUT_PRINTS = [f"{OUT}Weekday hours worked: {RESET}", f"{OUT}Weekend hours worked: {RESET}", f"{OUT}Weekday pay rate: {RESET}$"]
     inputsDone = [False, False, False]
-
     for i in range(len(INPUT_PRINTS)): # Only needs one while loop! Yay! Better UX!
         while sum(inputsDone) != len(inputsDone):
             if inputsDone[i] == False:
