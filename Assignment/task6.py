@@ -1,4 +1,4 @@
-'''
+'''PLUS = f"{RESET}[{GOOD}+{RESET}] "cle
 Author: Nathan Hines 21523561
 Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Use a loop to draw a pattern of circles
@@ -9,21 +9,23 @@ from turtle import *
 
 # Constants
 ERROR = Fore.RED
-OUT = Fore.YELLOW
+INP = Fore.YELLOW
 RESET = Fore.RESET
+HASH = f"{RESET}[{INP}#{RESET}] "
+MINUS = f"{RESET}[{ERROR}-{RESET}] "
 
 # Function to get the number of circles to draw
 def get_circle_values():
     # Error catching
     while True:
         try:
-            drawingValue = int(input(f"{OUT}Enter an integer between 2-6 (inclusive): {RESET}"))
+            drawingValue = int(input(f"{HASH}Enter an integer between 2-6 (inclusive): {RESET}"))
             pass
         except ValueError:
-            print(f"\n{ERROR}Error: Not an integer (whole number). Try again.{RESET}\n")
+            print(f"\n{MINUS}{ERROR}Error: Not an integer (whole number). Try again.{RESET}\n")
             continue
         if drawingValue > 6 or drawingValue < 2:
-            print(f"\n{ERROR}Error: Value must be between 2-6 (includes integers \'{RESET}2{ERROR}\' and \'{RESET}6{ERROR}\')\n")
+            print(f"\n{MINUS}{ERROR}Error: Value must be between 2-6 (includes integers \'{RESET}2{ERROR}\' and \'{RESET}6{ERROR}\')\n")
             continue
         else:
             break
