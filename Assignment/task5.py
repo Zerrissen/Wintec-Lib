@@ -46,7 +46,6 @@ def get_product_info():
                     continue
             else:
                 break
-    #print("Done!") # Used for testing purposes
     get_customer_info(price, quantity) # Passes these parameters so calculation can see them without making them global.
 
 # Function to determine information about the user.
