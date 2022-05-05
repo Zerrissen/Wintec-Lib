@@ -55,13 +55,13 @@ def main_menu(*args):
 ██╔══██║██║██║╚██╗██║██╔══╝  ╚════██║    ██║  ██║██╔══██╗
 ██║  ██║██║██║ ╚████║███████╗███████║    ██████╔╝██████╔╝
 ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝    ╚═════╝ ╚═════╝ \n{RESET}''')
-    print(f"Welcome to Hines Film Database! How can we help?")
-    print(f"\n\t1\tDisplay current film database")
-    print(f"\t2\tSearch for an item in the film database")
-    print(f"\t3\tAdd to current film database")
-    print(f"\t4\tRemove from current film database")
-    print(f"\t5\tRestore from archive database")
-    print(f"\t6\tExit Application")
+    print("Welcome to Hines Film Database! How can we help?")
+    print("\n\t1\tDisplay current film database")
+    print("\t2\tSearch for an item in the film database")
+    print("\t3\tAdd to current film database")
+    print("\t4\tRemove from current film database")
+    print("\t5\tRestore from archive database")
+    print("\t6\tExit Application")
     while True:
         try:
             value = int(input(f"\n{HASH}Enter your choice (1-6): "))
