@@ -169,8 +169,7 @@ def add_item():
                 newItems.append(value)
                 inputsDone[i] = True
                 break
-            else:
-                break
+            break # Doesn't require 'else' statement. Can implicitly break here.
     save('add', list(newItems))
     print(f"\n{PLUS}Item Added!")
     sort_items()
@@ -210,41 +209,40 @@ def remove_item():
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             
             continue
+        # If idToRemove is blank, break, otherwise continue
         if idToRemove == "":
             break
+
+        df1 = read_database('active')
+        df1 = df1.reset_index()
+        df1 = df1.values
+        if any (idToRemove in i for i in df1[:,0]):
+            while True:
+                try:
+                    value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
+                except Exception as e:
+                    print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+                    
+                    continue
+                if value == "y":
+                    # Read the database and convert it to a numpy array for manipulation
+                    # Save the entry to the archive
+                    itemToArchive = np.copy(df1[np.where(df1 == idToRemove)[0]])
+                    # Convert back to dataframe
+                    itemToArchive = pd.DataFrame(itemToArchive, columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
+                    itemToArchive = itemToArchive.set_index(['Film ID'])
+                    save('archive', itemToArchive)
+                    # Remove the entry from the database and save.
+                    df1 = np.delete(df1, np.where(df1 == idToRemove)[0], axis=0)
+                    save('full', df1, 'full')
+                    print(f"\n{MINUS}Item removed!")
+                    break
+                break # Doesn't require 'else' statement. Can implicitly break here.
+            break
         else:
-            df1 = read_database('active')
-            df1 = df1.reset_index()
-            df1 = df1.values
-            if any (idToRemove in i for i in df1[:,0]):
-                while True:
-                    try:
-                        value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
-                    except Exception as e:
-                        print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-                        
-                        continue
-                    if value == "y":
-                        # Read the database and convert it to a numpy array for manipulation
-                        # Save the entry to the archive
-                        itemToArchive = np.copy(df1[np.where(df1 == idToRemove)[0]])
-                        # Convert back to dataframe
-                        itemToArchive = pd.DataFrame(itemToArchive, columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
-                        itemToArchive = itemToArchive.set_index(['Film ID'])
-                        save('archive', itemToArchive)
-                        # Remove the entry from the database and save.
-                        df1 = np.delete(df1, np.where(df1 == idToRemove)[0], axis=0)
-                        save('full', df1, 'full')
-                        print(f"\n{MINUS}Item removed!")
-                        break
-                    else:
-                        break
-                
-                break
-            else:
-                print(f"{MINUS}{ERROR}\nError: Item does not exist. Try again.{RESET}\n")
-                
-                continue
+            print(f"{MINUS}{ERROR}\nError: Item does not exist. Try again.{RESET}\n")
+            continue
+
     sort_items()
 
 # Function to reverse the archive.
