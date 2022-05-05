@@ -123,7 +123,7 @@ def search():
         # Get item to search
         try:
             value = input(f"{HASH}Enter the ID of the film you wish to search: ").upper().strip()
-        except Exception as e:
+        except Exception as e: # skipcq
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             
             continue
@@ -205,7 +205,7 @@ def remove_item():
     while True:
         try:
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove: ").upper().strip()
-        except Exception as e:
+        except Exception as e: # skipcq
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             
             continue
@@ -220,7 +220,7 @@ def remove_item():
             while True:
                 try:
                     value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
-                except Exception as e:
+                except Exception as e: # skipcq
                     print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
                     continue
                 if value == "y":
@@ -250,13 +250,13 @@ def restore_item():
     while True:
         try:
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to restore: ").upper().strip()
-        except Exception as e:
+        except Exception as e: # skipcq
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             continue
         while True:
             try:
                 value = input(f"{HASH}Are you sure you want to restore the film with ID {idToRemove}? (y/n): ").lower().strip()
-            except Exception as e:
+            except Exception as e: # skipcq
                 print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
                 continue
             if value == "y":
@@ -384,7 +384,7 @@ def pause():
     while True:
         try:
             input(f"\n{HASH}Press enter to clear and return to menu.")
-        except Exception as e:
+        except Exception as e: # skipcq
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             continue
         break
