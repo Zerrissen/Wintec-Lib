@@ -13,10 +13,6 @@ import gc
 from colorama import init, Fore
 from time import sleep
 
-# Module used to test memory usage
-import psutil
-not_my_data = set(dir()) # Stores built-in variables
-
 # Constants
 ERROR = Fore.RED
 INP = Fore.YELLOW
@@ -75,7 +71,7 @@ def main_menu(*args):
         if value == 1:
             display()
             pause()
-            del value; gc.collect() # gc.collect() calls the python garbage collector. Always called alongside del keyword.
+            del value; gc.collect() # gc.collect() calls the python garbage collector. Called alongside any del keyword.
             break
         if value == 2:
             search()
@@ -115,6 +111,7 @@ def display(*arg):
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('active').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
+        print('Total budget loss:',)
         print('')
     elif arg[0] == 'archive':
         titleColumn, budgetColumn, boxOfficeColumn = read_database('archive').columns
@@ -123,7 +120,7 @@ def display(*arg):
         for (filmID, title, budget, boxOffice) in read_database('archive').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
         print('')
-    
+
     del titleColumn, budgetColumn, boxOfficeColumn, title, budget, boxOffice, filmID, arg; gc.collect()
 
 # Function to search for a row using the index.
@@ -143,6 +140,7 @@ def search():
             print('---------------------------------------------------------')
             for (filmID, title, budget, boxOffice) in read_database('active').loc[[value]].itertuples(index=True):
                 print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
+                print('Total budget loss:')
         except KeyError:
             print(f"{MINUS}{ERROR}Error: Item not in list. Try again.{RESET}")
             continue
@@ -170,10 +168,7 @@ def add_item():
                             continue
                     elif i == 2:
                         value = int(input(f"{HASH}Please enter the value for \'" + inputPrints[i]+ "\': "))
-                        if value > 100:
-                            print(f"{MINUS}{ERROR}Error: \'{RESET}"+inputPrints[i]+f"{ERROR}\' Cannot be greater than 100. Try again{RESET}")
-                            continue
-                        elif value < 0:
+                        if value < 0:
                             print(f"{MINUS}{ERROR}Error: \'{RESET}"+inputPrints[i]+f"{ERROR}\' Cannot be less than 0. Try again{RESET}")
                             continue
                 except Exception as e:
@@ -218,7 +213,6 @@ def gen_new_film_id():
     # Get the highest number and +1 to it, giving a new ID.
     newID = np.amax(mergedList) + 1
     newID = f'FM{newID:02d}'
-
 
     del df1, df2, mergedList, numFilter, numString, i; gc.collect()
 
@@ -433,7 +427,6 @@ def pause():
             del e; gc.collect()
             continue
         break
-
 
 # Driver code in the event program is run as a module.
 if __name__ == '__main__':
