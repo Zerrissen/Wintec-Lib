@@ -16,7 +16,7 @@ def get_worker_values():
     inputsDone = [False, False, False]
     for i in enumerate(INPUT_PRINTS): # Only needs one while loop! Yay! Better UX!
         while sum(inputsDone) != len(inputsDone):
-            if inputsDone[i] == False:
+            if inputsDone[i] is False:
                 try:
                     value = float(input(INPUT_PRINTS[i]))
                 except ValueError:

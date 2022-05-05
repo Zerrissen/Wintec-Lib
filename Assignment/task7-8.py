@@ -157,7 +157,7 @@ def add_item():
     # Error catching input loop
     for i in enumerate(inputPrints):
         while sum(inputsDone) != len(inputsDone):
-            if inputsDone[i] == False:
+            if inputsDone[i] is False:
                 try:
                     if i == 0:
                         value = input(f"{HASH}Please enter the value for \'" + inputPrints[i]+ "\': ")

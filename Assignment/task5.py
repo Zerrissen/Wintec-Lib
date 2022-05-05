@@ -17,7 +17,7 @@ def get_product_info():
     inputsDone = [False, False]
     for i in enumerate(INPUT_PRINTS):
         while sum(inputsDone) != len(inputsDone):
-            if inputsDone[i] == False:
+            if inputsDone[i] is False:
                 try: # Checks values of BOTH inputs with only one loop! Yay!
                     value = float(input(INPUT_PRINTS[i]))
                 except ValueError:
@@ -73,7 +73,7 @@ def get_customer_info(price, quantity):
 def calculate_and_output(price, quantity, claimed):
     totalPriceBeforeDiscount = price * quantity
 
-    if claimed == True and totalPriceBeforeDiscount < 500:
+    if claimed is True and totalPriceBeforeDiscount < 500:
         print(f"\n{OUT}Total price: {RESET}${totalPriceBeforeDiscount:.2f} \n{OUT}Claimed discount: {RESET}" + str(claimed))
         print(f"\n{OUT}You are eligible for the discount.")
     else:
