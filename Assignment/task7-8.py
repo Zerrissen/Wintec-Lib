@@ -155,7 +155,7 @@ def add_item():
     inputPrints = list(read_database('active').columns.values.tolist())
     inputsDone = [False, False, False]
     # Error catching input loop
-    for i in range(len(inputPrints)):
+    for i in enumerate(inputPrints):
         while sum(inputsDone) != len(inputsDone):
             if inputsDone[i] == False:
                 try:

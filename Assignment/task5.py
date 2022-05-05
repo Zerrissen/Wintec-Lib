@@ -15,7 +15,7 @@ INPUT_PRINTS = [f"{OUT}Enter item price: {RESET}$", f"{OUT}Enter quantity of ite
 # Function used to get users product values
 def get_product_info():
     inputsDone = [False, False]
-    for i in range(len(INPUT_PRINTS)):
+    for i in enumerate(INPUT_PRINTS):
         while sum(inputsDone) != len(inputsDone):
             if inputsDone[i] == False:
                 try: # Checks values of BOTH inputs with only one loop! Yay!

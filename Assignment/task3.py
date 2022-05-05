@@ -14,7 +14,7 @@ INPUT_PRINTS = [f"{OUT}Weekday hours worked: {RESET}", f"{OUT}Weekend hours work
 # Function to get user input
 def get_worker_values():
     inputsDone = [False, False, False]
-    for i in range(len(INPUT_PRINTS)): # Only needs one while loop! Yay! Better UX!
+    for i in enumerate(INPUT_PRINTS): # Only needs one while loop! Yay! Better UX!
         while sum(inputsDone) != len(inputsDone):
             if inputsDone[i] == False:
                 try:
