@@ -169,7 +169,7 @@ def add_item():
                 newItems.append(value)
                 inputsDone[i] = True
                 break
-            break # Doesn't require 'else' statement. Can implicitly break here.
+            break  # Doesn't require 'else' statement. Can implicitly break here.
     save('add', list(newItems))
     print(f"\n{PLUS}Item Added!")
     sort_items()
@@ -216,13 +216,12 @@ def remove_item():
         df1 = read_database('active')
         df1 = df1.reset_index()
         df1 = df1.values
-        if any (idToRemove in i for i in df1[:,0]):
+        if any(idToRemove in i for i in df1[:,0]):
             while True:
                 try:
                     value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
                 except Exception as e:
                     print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-                    
                     continue
                 if value == "y":
                     # Read the database and convert it to a numpy array for manipulation
@@ -237,7 +236,7 @@ def remove_item():
                     save('full', df1, 'full')
                     print(f"\n{MINUS}Item removed!")
                     break
-                break # Doesn't require 'else' statement. Can implicitly break here.
+                break  # Doesn't require 'else' statement. Can implicitly break here.
             break
         else:
             print(f"{MINUS}{ERROR}\nError: Item does not exist. Try again.{RESET}\n")
