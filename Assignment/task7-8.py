@@ -6,7 +6,10 @@ Description: Display a list of records and allow some added functionality
 
 import numpy as np
 import pandas as pd
-import csv, os, platform, sys
+import csv
+import os
+import platform
+import sys
 from colorama import init, Fore
 from time import sleep
 
