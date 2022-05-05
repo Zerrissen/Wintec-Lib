@@ -94,7 +94,7 @@ def main_menu(*args):
                 # Exit program
                 sys.exit(0)
         main_menu(clearConsole)
-    
+
     # Catch keyboard interrupt (ctrl+c) at any stage in the program, and exit cleanly without lots of traceback messages.
     except KeyboardInterrupt:
         print(f"\n{MINUS}{ERROR}Error: Keyboard Interrupt detected. Shutting down.")
@@ -125,7 +125,7 @@ def search():
             value = input(f"{HASH}Enter the ID of the film you wish to search: ").upper().strip()
         except Exception as e: # skipcq
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-            
+
             continue
         try:
             # Display searched item
@@ -192,7 +192,7 @@ def gen_new_film_id():
         numFilter = filter(str.isdigit, mergedList[i])
         numString = "".join(numFilter)
         mergedList[i] = int(numString)
-    
+
     # Get the highest number and +1 to it, giving a new ID.
     newID = np.amax(mergedList) + 1
     newID = f'FM{newID:02d}'
@@ -207,7 +207,7 @@ def remove_item():
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove: ").upper().strip()
         except Exception as e: # skipcq
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-            
+
             continue
         # If idToRemove is blank, break, otherwise continue
         if idToRemove == "":
@@ -275,7 +275,7 @@ def restore_item():
                     df1 = np.delete(df1, np.where(df1 == idToRemove)[0], axis=0)
                     save('full', df1, 'archive')
                     print(f"\n{PLUS}Item restored!")
-                    
+
                     break
             else:
                 break
@@ -305,7 +305,7 @@ def read_database(*args):
         filmList = pd.read_csv('filmDB.csv', header=0, index_col=0)
     elif args[0] == 'archive':
         filmList = pd.read_csv('filmDB_archive.csv', header=0, index_col=0)
-    
+
     return filmList
 
 # Function to sort items by their Film ID.
