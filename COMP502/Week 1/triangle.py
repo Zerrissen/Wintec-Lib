@@ -3,7 +3,7 @@ Author: Nathan Hines
 Purpose: To draw a triangle using turtle
 '''
 
-from turtle import *
+from turtle import pu, goto, pd, left, fd, exitonclick
 
 def drawTriangle():
     pu()

@@ -3,7 +3,7 @@ Author: Nathan Hines
 Purpose: To draw a letter using turtle
 '''
 
-from turtle import *
+from turtle import write, pencolor, pensize, left, fd, right, back, exitonclick
 
 write("Welcome to Python")
 pencolor("blue")

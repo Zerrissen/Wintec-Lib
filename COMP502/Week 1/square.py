@@ -3,7 +3,7 @@ Author: Nathan Hines
 Purpose: To draw a square using turtle
 '''
 
-from turtle import *
+from turtle import speed, fd, rt, pu, pd, goto, setpos, exitonclick
 
 def choose():
     while True:
