@@ -71,33 +71,33 @@ def main_menu(*args):
         if value == 1:
             display()
             pause()
-            del value; gc.collect() # gc.collect() calls the python garbage collector. Called alongside any del keyword.
+            gc.collect() # gc.collect() calls the python garbage collector. Called alongside any del keyword.
             break
         if value == 2:
             search()
             pause()
-            del value; gc.collect()
+            gc.collect()
             break
         if value == 3:
             add_item()
             pause()
-            del value; gc.collect()
+            gc.collect()
             break
         if value == 4:
             remove_item()
             pause()
-            del value; gc.collect()
+            gc.collect()
             break
         if value == 5:
             restore_item()
             pause()
-            del value; gc.collect()
+            gc.collect()
             break
         if value == 6:
             print(f"\n{HASH}Saving database and closing program...")
             save('full')
             print(f"{HASH}Closing program.")
-            del value; gc.collect()
+            gc.collect()
             sleep(2)
             # Exit program
             os._exit(0)
@@ -121,7 +121,7 @@ def display(*arg):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
         print('')
 
-    del titleColumn, budgetColumn, boxOfficeColumn, title, budget, boxOffice, filmID, arg; gc.collect()
+    gc.collect()
 
 # Function to search for a row using the index.
 def search():
@@ -131,7 +131,7 @@ def search():
             value = input(f"{HASH}Enter the ID of the film you wish to search: ").upper().strip()
         except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-            del e; gc.collect()
+            gc.collect()
             continue
         try:
             # Display searched item
@@ -146,7 +146,7 @@ def search():
             continue
         break
 
-    del value, titleColumn, budgetColumn, boxOfficeColumn, title, budget, boxOffice, filmID; gc.collect()
+    gc.collect()
 
 # Function to add an item to the database.
 def add_item():
@@ -174,11 +174,11 @@ def add_item():
                 except Exception as e:
                     if e.__class__.__name__ == "ValueError":
                         print(f"{MINUS}{ERROR}Error: \'{RESET}"+str(value)+f"{ERROR}\' is not a valid number. Try again{RESET}")
-                        del e; gc.collect()
+                        gc.collect()
                         continue
                     else:
                         print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-                        del e; gc.collect()
+                        gc.collect()
                         continue
                 newItems.append(value)
                 inputsDone[i] = True
@@ -189,7 +189,7 @@ def add_item():
     print(f"\n{PLUS}Item Added!")
     sort_items()
 
-    del newItems, inputPrints, inputsDone, value, i; gc.collect()
+    gc.collect()
 
 # Function to generate and return a new ID based on the largest known index.
 def gen_new_film_id():
@@ -214,7 +214,7 @@ def gen_new_film_id():
     newID = np.amax(mergedList) + 1
     newID = f'FM{newID:02d}'
 
-    del df1, df2, mergedList, numFilter, numString, i; gc.collect()
+    gc.collect()
 
     return newID
 
@@ -226,7 +226,7 @@ def remove_item():
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove: ").upper().strip()
         except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-            del e; gc.collect()
+            gc.collect()
             continue
         if idToRemove == "":
             break
@@ -240,7 +240,7 @@ def remove_item():
                         value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
                     except Exception as e:
                         print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-                        del e; gc.collect()
+                        gc.collect()
                         continue
                     if value == "y":
                         # Read the database and convert it to a numpy array for manipulation
@@ -257,15 +257,15 @@ def remove_item():
                         break
                     else:
                         break
-                del value, itemToArchive, df1; gc.collect()
+                gc.collect()
                 break
             else:
                 print(f"{MINUS}{ERROR}\nError: Item does not exist. Try again.{RESET}\n")
-                del df1, idToRemove; gc.collect()
+                gc.collect()
                 continue
 
     sort_items()
-    del idToRemove; gc.collect()
+    gc.collect()
 
 # Function to reverse the archive.
 def restore_item():
@@ -275,14 +275,14 @@ def restore_item():
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to restore: ").upper().strip()
         except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-            del e; gc.collect()
+            gc.collect()
             continue
         while True:
             try:
                 value = input(f"{HASH}Are you sure you want to restore the film with ID {idToRemove}? (y/n): ").lower().strip()
             except Exception as e:
                 print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-                del e; gc.collect()
+                gc.collect()
                 continue
             if value == "y":
                 # Read the database and convert it to a numpy array for manipulation
@@ -300,14 +300,14 @@ def restore_item():
                     df1 = np.delete(df1, np.where(df1 == idToRemove)[0], axis=0)
                     save('full', df1, 'archive')
                     print(f"\n{PLUS}Item restored!")
-                    del itemToArchive, df1; gc.collect()
+                    gc.collect()
                     break
             else:
                 break
         break
     
     sort_items()
-    del idToRemove, value; gc.collect()
+    gc.collect()
 
 # Function to generate default database for first program running or database deletion.
 def generate_default(*arg):
@@ -323,9 +323,9 @@ def generate_default(*arg):
             csvWriter = csv.writer(filmDBArchive)
             csvWriter.writerow(headers)
         print(f"{PLUS}Film Database Archive File generated!\n")
-        del headers, filmDBArchive, csvWriter; gc.collect()
+        gc.collect()
         sleep(1)
-    del arg; gc.collect()
+    gc.collect()
 
 # Function to open the database and return its current structure, used during database modification and reading.
 def read_database(*args):
@@ -334,7 +334,7 @@ def read_database(*args):
     elif args[0] == 'archive':
         filmList = pd.read_csv('filmDB_archive.csv', header=0, index_col=0)
     
-    del args; gc.collect()
+    gc.collect()
     return filmList
 
 # Function to sort items by their Film ID.
@@ -350,7 +350,7 @@ def sort_items():
     save('full', df1, 'full')
     save('full', df2, 'archive')
 
-    del df1, df2; gc.collect()
+    gc.collect()
 
 # Function to save whatever dataframe is parsed.
 def save(*args):
@@ -362,14 +362,14 @@ def save(*args):
                 if os.path.exists('filmDB.csv'):
                     newItems = pd.DataFrame(list(args[1]), columns=["Film ID", "Film Name", "Film Budget", "Box Office Rating"])
                     newItems.to_csv('filmDB.csv', index=False, header=True, mode='w')
-                    del newItems; gc.collect()
+                    gc.collect()
                 else:
                     print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
             elif args[2] == 'archive':
                 if os.path.exists('filmDB_archive.csv'):
                     restoredItems = pd.DataFrame(list(args[1]), columns=["Film ID", "Film Name", "Film Budget", "Box Office Rating"])
                     restoredItems.to_csv('filmDB_archive.csv', index=False, header=True, mode='w')
-                    del restoredItems; gc.collect()
+                    gc.collect()
                 else:
                     print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.")
         else:
@@ -391,7 +391,7 @@ def save(*args):
             with open("filmDB.csv", "a", newline='\n') as filmDB:
                 csvWriter = csv.writer(filmDB)
                 csvWriter.writerow(newItems)
-            del newItems, csvWriter, filmDB; gc.collect()
+            gc.collect()
         else:
             print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
 
@@ -401,7 +401,7 @@ def save(*args):
             itemsToArchive = pd.DataFrame(args[1], columns=["Film Name", "Film Budget", "Box Office Rating"])
             itemsToArchive = itemsToArchive.reset_index()
             itemsToArchive.to_csv('filmDB_archive.csv', index=False, header=False, mode='a')
-            del itemsToArchive; gc.collect()
+            gc.collect()
         else:
             print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.")
 
@@ -411,11 +411,11 @@ def save(*args):
             itemsToArchive = pd.DataFrame(args[1], columns=["Film Name", "Film Budget", "Box Office Rating"])
             itemsToArchive = itemsToArchive.reset_index()
             itemsToArchive.to_csv('filmDB.csv', index=False, header=False, mode='a')    
-            del itemsToArchive; gc.collect()
+            gc.collect()
         else:
             print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
 
-    del args; gc.collect()
+    gc.collect()
 
 # Function used to wait for user input to return from their current activity and return to the menu.
 def pause():
@@ -424,7 +424,7 @@ def pause():
             input(f"\n{HASH}Press enter to clear and return to menu.")
         except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-            del e; gc.collect()
+            gc.collect()
             continue
         break
 
