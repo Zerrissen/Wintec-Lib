@@ -5,7 +5,7 @@ Description: Use a loop to draw a pattern of circles
 '''
 
 from colorama import init, Fore
-from turtle import *
+from turtle import speed, pu, goto, pd, fillcolor, begin_fill, circle, end_fill, left, fd, exitonclick
 
 # Constants
 ERROR = Fore.RED

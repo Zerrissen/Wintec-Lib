@@ -5,7 +5,6 @@ Description: Return perimeter and area from given radius of a circle.
 '''
 
 import math
-from turtle import *
 
 def get_radius(): # Function to get the user-given radius
     while True: # Error-catching try-except loop

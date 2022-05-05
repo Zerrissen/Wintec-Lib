@@ -3,7 +3,7 @@ Author: Nathan Hines 21523561
 Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Draw first letter of family name.
 '''
-from turtle import *
+from turtle import pu, setpos, pd, goto, exitonclick
 
 
 def drawFamilyLetter(): # Function to contain turtle drawing code
