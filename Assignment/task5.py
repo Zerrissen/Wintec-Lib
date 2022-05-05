@@ -59,10 +59,10 @@ def get_customer_info(price, quantity):
         except ValueError:
             print(f"\n{ERROR}Error: Invalid input. Try again.\n")
             continue
-        if customerClaimedDiscount == "y" or customerClaimedDiscount == "Y":
+        if customerClaimedDiscount in ("y", "Y"):
             claimed = True
             break
-        elif customerClaimedDiscount == "n" or customerClaimedDiscount == "N":
+        elif customerClaimedDiscount in ("n", "N"):
             claimed = False
             break
         else: # In case of some random error
