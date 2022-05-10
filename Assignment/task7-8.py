@@ -44,20 +44,28 @@ def main_menu():
         os.system(clearConsole)
         print(TITLE)
         print('Welcome to Hines Film Database! How can we help?')
-        print('\n\t1\tDisplay current film database')
-        print('\t2\tSearch for an item in the film database')
-        print('\t3\tAdd to current film database')
-        print('\t4\tRemove from current film database')
-        print('\t5\tRestore from archive database')
-        print('\t6\tDisplay help and program info')
-        print('\t99\tExit Application')
+        print('\n\t[1]\tDisplay current film database')
+        print('\t[2]\tSearch for an item in the film database')
+        print('\t[3]\tAdd to current film database')
+        print('\t[4]\tRemove from current film database')
+        print('\t[5]\tRestore from archive database')
+        print('\t[6]\tDisplay help and program info')
+        print('\t[99]\tExit Application')
         while True:
             try:
-                value = int(input(f'\n{HASH}Enter your choice (1-99): '))
+                value = input(f'\n{HASH}Enter your choice (1-99): ')
+                # Implicitly convert value, otherwise except statement ignores creation of value.
+                value = int(value)
             except ValueError:
-                print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' is not a valid choice. Try again.{RESET}')
-                continue
+                if value == '':
+                    pause()
+                    break
+                else:
+                    print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' is not a valid choice. Try again.{RESET}')
+                    continue
             if value == 1:
+                # Other functions have the 'clearConsole' command and 'TITLE' print built-in.
+                # Display is called in other functions, hence implicit use.
                 os.system(str(clearConsole))
                 print(TITLE)
                 print(f'{HASH}Database Display selected!')
@@ -91,6 +99,7 @@ def main_menu():
                 sleep(2)
                 # Exit program
                 sys.exit(0)
+            # Fallback 'else' in event input is a valid integer but not valid choice.
             else:
                 print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' was not a valid choice. Try again.{RESET}')
                 continue
@@ -108,7 +117,10 @@ def display(*arg):
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('active').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
-        print('\nTotal budget loss:',get_budget_loss('active'),'\n')
+        if get_budget_loss('active') < 0:
+            print('\nTotal Profit: $' + str(abs(get_budget_loss('active')) + 'M\n'))
+        else:
+            print('\nTotal budget loss: $' + str(get_budget_loss('active')) + 'M\n')
 
     elif arg[0] == 'archive':
         titleColumn, budgetColumn, boxOfficeColumn = read_database('archive').columns
@@ -116,17 +128,21 @@ def display(*arg):
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('archive').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
-        print('\nTotal budget loss:',get_budget_loss('archive'),'\n')
+        if get_budget_loss('archive') < 0:
+            print('\nTotal Profit: $' + str(abs(get_budget_loss('archive')) + 'M\n'))
+        else:
+            print('\nTotal budget loss: $' + str(get_budget_loss('archive')) + 'M\n')
 
 # Function to search for a row using the index.
 def search_by_id():
     os.system(str(clearConsole))
     print(TITLE)
-    print(f'{HASH}Search Database selected!')
+    print(f'{HASH}Search Database selected!\n')
     while True:
+        isID = False
         # Get item to search
         try:
-            value = input(f'{HASH}Enter the ID of the film you wish to search\n{HASH}Leave blank to cancel.\n{HASH}ID to search (format FMxx): ').upper().strip()
+            value = input(f'{HASH}Enter the ID or Film Name you wish to search\n{HASH}Leave blank to cancel.\n{HASH}Search Value (ID format FMxx): ').upper().strip()
         except Exception as e:
             print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
             continue
@@ -135,15 +151,37 @@ def search_by_id():
             break
         else:
             try:
-                # Force check the item actually exists to skip prints if KeyError. Takes longer but cleaner output.
-                read_database('active').loc[[value]].itertuples(index=True)
-                # Display searched item
+                # Check whether the search is a valid ID or not.
+                isID = value in read_database('active').index
+                # If not a valid ID, start searching by name. Will KeyError if not a valid name either.
+                if isID == False:
+                    filmByName = read_database('active')['Film Name'].str.contains(value, regex=False, case=False)
+                    filmByName = filmByName[filmByName].index.values
+                    if len(filmByName) == 0:
+                        raise KeyError
+
+                # Display searched items
                 titleColumn, budgetColumn, boxOfficeColumn = read_database('active').columns
                 print(f'\n{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
                 print('---------------------------------------------------------')
-                for (filmID, title, budget, boxOffice) in read_database('active').loc[[value]].itertuples(index=True):
-                    print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
-                print('\nFilm budget loss:',get_budget_loss('search', value),'\n')
+                if isID == True:
+                    for (filmID, title, budget, boxOffice) in read_database('active').loc[[value]].itertuples(index=True):
+                        print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
+                        if get_budget_loss('search', value) < 0:
+                            print('\nFilm Proft: $' + str(abs(get_budget_loss('search', value))) + 'M\n')
+                        else:
+                            print('\nFilm budget loss: $' + str(get_budget_loss('search', value))+'M\n')
+                else:
+                    for i in range(len(filmByName)):
+                        for (filmID, title, budget, boxOffice) in read_database('active').loc[[filmByName[i]]].itertuples(index=True):
+                            print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
+                    total = 0
+                    for i in range(len(filmByName)):
+                        total += get_budget_loss('search', filmByName[i])
+                    if total < 0:
+                        print('\nTotal Proft: $' + str(abs(total)) + 'M\n')
+                    else:
+                        print('\nTotal budget loss: $' + str(total)+'M\n')
             except KeyError:
                 print(f'{MINUS}{ERROR}Error: Item not in database. Try again.{RESET}')
                 continue
@@ -443,7 +481,7 @@ def save(*args):
 def pause():
     while True:
         try:
-            input(f'\n{HASH}Press enter to clear and return to menu.')
+            input(f'\n{HASH}Press enter to clear and return.')
         except Exception as e:
             print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
             continue
