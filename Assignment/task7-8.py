@@ -16,7 +16,7 @@ try:
     from time import sleep
 except ImportError as e:
     print(e)
-    print("Run \'python3 -m pip install -r requirements.txt\' to install all required modules.")
+    print('Run \'python3 -m pip install -r requirements.txt\' to install all required modules.')
     exit()
 
 # Constants
@@ -32,9 +32,9 @@ TITLE = f'''{Fore.MAGENTA}
 ██╔══██║██║██║╚██╗██║██╔══╝  ╚════██║    ██║  ██║██╔══██╗
 ██║  ██║██║██║ ╚████║███████╗███████║    ██████╔╝██████╔╝
 ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝    ╚═════╝ ╚═════╝ \n{RESET}'''
-HASH = f"{RESET}[{INP}#{RESET}] "
-MINUS = f"{RESET}[{ERROR}-{RESET}] "
-PLUS = f"{RESET}[{GOOD}+{RESET}] "
+HASH = f'{RESET}[{INP}#{RESET}] '
+MINUS = f'{RESET}[{ERROR}-{RESET}] '
+PLUS = f'{RESET}[{GOOD}+{RESET}] '
 
 DEFAULT_LIST = pd.DataFrame([['FM01','Stealth', 135, 80], ['FM02','Supernova', 90, 15], ['FM03','Robin Hood', 100, 85], ['FM04','Rollerball', 70, 26], ['FM05','Rust', 85, 20]], columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
 
@@ -43,19 +43,19 @@ def main_menu():
     try:
         os.system(clearConsole)
         print(TITLE)
-        print("Welcome to Hines Film Database! How can we help?")
-        print("\n\t1\tDisplay current film database")
-        print("\t2\tSearch for an item in the film database")
-        print("\t3\tAdd to current film database")
-        print("\t4\tRemove from current film database")
-        print("\t5\tRestore from archive database")
-        print("\t6\tDisplay help and program info")
-        print("\t99\tExit Application")
+        print('Welcome to Hines Film Database! How can we help?')
+        print('\n\t1\tDisplay current film database')
+        print('\t2\tSearch for an item in the film database')
+        print('\t3\tAdd to current film database')
+        print('\t4\tRemove from current film database')
+        print('\t5\tRestore from archive database')
+        print('\t6\tDisplay help and program info')
+        print('\t99\tExit Application')
         while True:
             try:
-                value = int(input(f"\n{HASH}Enter your choice (1-6): "))
+                value = int(input(f'\n{HASH}Enter your choice (1-99): '))
             except ValueError:
-                print(f"{MINUS}{ERROR}Error: input was not a valid choice. Try again.{RESET}")
+                print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' is not a valid choice. Try again.{RESET}')
                 continue
             if value == 1:
                 os.system(str(clearConsole))
@@ -64,44 +64,47 @@ def main_menu():
                 display()
                 pause()
                 break
-            if value == 2:
+            elif value == 2:
                 search_by_id()
                 pause()
                 break
-            if value == 3:
+            elif value == 3:
                 add_item()
                 pause()
                 break
-            if value == 4:
+            elif value == 4:
                 remove_item()
                 pause()
                 break
-            if value == 5:
+            elif value == 5:
                 restore_item()
                 pause()
                 break
-            if value == 6:
+            elif value == 6:
                 help_and_info()
                 pause()
                 break
-            if value == 99:
-                print(f"\n{HASH}Saving database and closing program...")
+            elif value == 99:
+                print(f'\n{HASH}Saving database and closing program...')
                 save('full')
-                print(f"{HASH}Closing program.")
+                print(f'{HASH}Closing program.')
                 sleep(2)
                 # Exit program
                 sys.exit(0)
+            else:
+                print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' was not a valid choice. Try again.{RESET}')
+                continue
         main_menu()
 
     # Catch keyboard interrupt (ctrl+c) at any stage in the program, and exit cleanly without lots of traceback messages.
     except KeyboardInterrupt:
-        print(f"\n{MINUS}{ERROR}Error: Keyboard Interrupt detected. Shutting down.")
+        print(f'\n{MINUS}{ERROR}Error: Keyboard Interrupt detected. Shutting down.')
 
 # Function to display the film database with formatted output.
 def display(*arg):
     if len(arg) == 0:
         titleColumn, budgetColumn, boxOfficeColumn = read_database('active').columns
-        print(f'\n{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
+        print(f"\n{'Film ID':<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}")
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('active').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
@@ -109,7 +112,7 @@ def display(*arg):
 
     elif arg[0] == 'archive':
         titleColumn, budgetColumn, boxOfficeColumn = read_database('archive').columns
-        print(f'\n{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
+        print(f"\n{'Film ID':<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}")
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('archive').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
@@ -123,12 +126,12 @@ def search_by_id():
     while True:
         # Get item to search
         try:
-            value = input(f"{HASH}Enter the ID of the film you wish to search\n{HASH}Leave blank to cancel.\n{HASH}ID to search (format FMxx): ").upper().strip()
+            value = input(f'{HASH}Enter the ID of the film you wish to search\n{HASH}Leave blank to cancel.\n{HASH}ID to search (format FMxx): ').upper().strip()
         except Exception as e:
-            print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+            print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
             continue
         # Check if value is blank and cancel search if it is.
-        if value == "":
+        if value == '':
             break
         else:
             try:
@@ -142,7 +145,7 @@ def search_by_id():
                     print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
                 print('\nFilm budget loss:',get_budget_loss('search', value),'\n')
             except KeyError:
-                print(f"{MINUS}{ERROR}Error: Item not in database. Try again.{RESET}")
+                print(f'{MINUS}{ERROR}Error: Item not in database. Try again.{RESET}')
                 continue
             break
 
@@ -161,26 +164,26 @@ def add_item():
             if inputsDone[i] is False:
                 try:
                     if i == 0:
-                        value = input(f"{HASH}Please enter the value for \'" + inputPrints[i]+ "\': ")
+                        value = input(f'{HASH}Please enter the value for \'' + inputPrints[i]+ '\': ')
                     elif i == 1:
-                        value = int(input(f"{HASH}Please enter the value for \'" + inputPrints[i]+ "\': "))
+                        value = int(input(f'{HASH}Please enter the value for \'' + inputPrints[i]+ '\': '))
                         if value < 0:
-                            print(f"{MINUS}{ERROR}Error: \'{RESET}"+inputPrints[i]+f"{ERROR}\' Cannot be less than 0. Try again{RESET}")
+                            print(f'{MINUS}{ERROR}Error: \'{RESET}'+inputPrints[i]+f'{ERROR}\' Cannot be less than 0. Try again{RESET}')
                             continue
                     elif i == 2:
-                        value = int(input(f"{HASH}Please enter the value for \'" + inputPrints[i]+ "\': "))
+                        value = int(input(f'{HASH}Please enter the value for \'' + inputPrints[i]+ '\': '))
                         if value < 0:
-                            print(f"{MINUS}{ERROR}Error: \'{RESET}"+inputPrints[i]+f"{ERROR}\' Cannot be less than 0. Try again{RESET}")
+                            print(f'{MINUS}{ERROR}Error: \'{RESET}'+inputPrints[i]+f'{ERROR}\' Cannot be less than 0. Try again{RESET}')
                             continue
                 except ValueError:
-                    print(f"{MINUS}{ERROR}Error: \'{RESET}"+str(value)+f"{ERROR}\' is not a valid number. Try again{RESET}")
+                    print(f'{MINUS}{ERROR}Error: \'{RESET}'+str(value)+f'{ERROR}\' is not a valid number. Try again{RESET}')
                     continue
                 newItems.append(value)
                 inputsDone[i] = True
                 break
             break  # Doesn't require 'else' statement. Can implicitly break here.
     save('add', list(newItems))
-    print(f"\n{PLUS}Item Added!")
+    print(f'\n{PLUS}Item Added!')
     sort_items()
 
 # Function to generate and return a new ID based on the largest known index.
@@ -199,7 +202,7 @@ def gen_new_film_id():
     # Iterate through list and store the ID numbers only.
     for i in range(len(mergedList)):
         numFilter = filter(str.isdigit, mergedList[i])
-        numString = "".join(numFilter)
+        numString = ''.join(numFilter)
         mergedList[i] = int(numString)
 
     # Get the highest number and +1 to it, giving a new ID.
@@ -217,12 +220,12 @@ def remove_item():
         print(f'{HASH}Film Removal selected!')
         display()
         try:
-            idToRemove = input(f"{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove (Format FMxx): ").upper().strip()
+            idToRemove = input(f'{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove (Format FMxx): ').upper().strip()
         except Exception as e:
-            print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+            print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
             continue
         # If idToRemove is blank, break, otherwise continue
-        if idToRemove == "":
+        if idToRemove == '':
             break
         dataframe1 = read_database('active')
         dataframe1 = dataframe1.reset_index()
@@ -232,11 +235,11 @@ def remove_item():
                 itemFound = True
                 while True:
                     try:
-                        value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
+                        value = input(f'{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ').lower().strip()
                     except Exception as e:
-                        print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+                        print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
                         continue
-                    if value == "y":
+                    if value == 'y':
                         # Read the database and convert it to a numpy array for manipulation
                         # Save the entry to the archive
                         itemToArchive = np.copy(dataframe1[np.where(dataframe1 == idToRemove)[0]])
@@ -247,7 +250,7 @@ def remove_item():
                         # Remove the entry from the database and save.
                         dataframe1 = np.delete(dataframe1, np.where(dataframe1 == idToRemove)[0], axis=0)
                         save('full', dataframe1, 'full')
-                        print(f"\n{MINUS}Item removed!")
+                        print(f'\n{MINUS}Item removed!')
                         break
                     break  # Doesn't require 'else' statement. Can implicitly break here.
         if itemFound == False:
@@ -265,19 +268,19 @@ def restore_item():
     display('archive')
     while True:
         try:
-            idToRemove = input(f"{HASH}Enter the ID of the film you wish to restore\n{HASH}Leave blank to cancel\n{HASH}ID to restore (format FMxx): ").upper().strip()
+            idToRemove = input(f'{HASH}Enter the ID of the film you wish to restore\n{HASH}Leave blank to cancel\n{HASH}ID to restore (format FMxx): ').upper().strip()
         except Exception as e:
-            print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+            print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
             continue
-        if idToRemove == "":
+        if idToRemove == '':
             break
         while True:
             try:
-                value = input(f"{HASH}Are you sure you want to restore the film with ID {idToRemove}? (y/n): ").lower().strip()
+                value = input(f'{HASH}Are you sure you want to restore the film with ID {idToRemove}? (y/n): ').lower().strip()
             except Exception as e:
-                print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+                print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
                 continue
-            if value == "y":
+            if value == 'y':
                 # Read the database and convert it to a numpy array for manipulation
                 dataframe1 = read_database('archive')
                 dataframe1 = dataframe1.reset_index()
@@ -292,7 +295,7 @@ def restore_item():
                     # Remove the entry from the archive and save.
                     dataframe1 = np.delete(dataframe1, np.where(dataframe1 == idToRemove)[0], axis=0)
                     save('full', dataframe1, 'archive')
-                    print(f"\n{PLUS}Item restored!")
+                    print(f'\n{PLUS}Item restored!')
 
                     break
             else:
@@ -320,17 +323,17 @@ def help_and_info():
 # Function to generate default database for first program running or database deletion.
 def generate_default(*arg):
     if arg[0] == 'active':
-        print(f"{HASH}Film Database File not found. Generating default...")
+        print(f'{HASH}Film Database File not found. Generating default...')
         DEFAULT_LIST.to_csv('filmDB.csv', index=False, header=True, mode='w+')
-        print(f"{PLUS}Film Database File generated!\n")
+        print(f'{PLUS}Film Database File generated!\n')
         sleep(1)
     elif arg[0] == 'archive':
-        print(f"{HASH}Film Database Archive File not found. Generating default...")
-        headers = ["Film ID", "Film Name", "Film Budget", "Box Office Rating"]
+        print(f'{HASH}Film Database Archive File not found. Generating default...')
+        headers = ['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating']
         with open('filmDB_archive.csv', 'a') as filmDBArchive:
             csvWriter = csv.writer(filmDBArchive)
             csvWriter.writerow(headers)
-        print(f"{PLUS}Film Database Archive File generated!\n")
+        print(f'{PLUS}Film Database Archive File generated!\n')
         sleep(1)
 
 # Function to open the database and return its current structure, used during database modification and reading.
@@ -376,7 +379,7 @@ def get_budget_loss(*args):
         filmBudgetLoss = filmBudget - filmBoxOffice
         return filmBudgetLoss
     else:
-        print(f"{MINUS}{ERROR}Error: Invalid parameters parsed.{RESET}")
+        print(f'{MINUS}{ERROR}Error: Invalid parameters parsed.{RESET}')
 
 # Function to save whatever dataframe is parsed.
 def save(*args):
@@ -386,63 +389,63 @@ def save(*args):
         if len(args) == 3:
             if args[2] == 'full':
                 if os.path.exists('filmDB.csv'):
-                    newItems = pd.DataFrame(list(args[1]), columns=["Film ID", "Film Name", "Film Budget", "Box Office Rating"])
+                    newItems = pd.DataFrame(list(args[1]), columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
                     newItems.to_csv('filmDB.csv', index=False, header=True, mode='w')
                 else:
-                    print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
+                    print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
             elif args[2] == 'archive':
                 if os.path.exists('filmDB_archive.csv'):
-                    restoredItems = pd.DataFrame(list(args[1]), columns=["Film ID", "Film Name", "Film Budget", "Box Office Rating"])
+                    restoredItems = pd.DataFrame(list(args[1]), columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
                     restoredItems.to_csv('filmDB_archive.csv', index=False, header=True, mode='w')
                 else:
-                    print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.")
+                    print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.')
         else:
             if os.path.exists('filmDB.csv'):
                 read_database('active').to_csv('filmDB.csv', index=True, header=True, mode='w')
-                print(f"{PLUS}Database saved!")
+                print(f'{PLUS}Database saved!')
             else:
-                print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
+                print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
             if os.path.exists('filmDB_archive.csv'):
                 read_database('archive').to_csv('filmDB_archive.csv', index=True, header=True, mode='w')
-                print(f"{PLUS}Archive saved!")
+                print(f'{PLUS}Archive saved!')
             else:
-                print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.")
+                print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.')
 
     # If wanting to add a new item
     elif args[0] == 'add':
         if os.path.exists('filmDB.csv'):
             newItems = list(args[1])
-            with open("filmDB.csv", "a", newline='\n') as filmDB:
+            with open('filmDB.csv', 'a', newline='\n') as filmDB:
                 csvWriter = csv.writer(filmDB)
                 csvWriter.writerow(newItems)
         else:
-            print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
+            print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
 
     # If wanting to archive an item
     elif args[0] == 'archive':
         if os.path.exists('filmDB_archive.csv'):
-            itemsToArchive = pd.DataFrame(args[1], columns=["Film Name", "Film Budget", "Box Office Rating"])
+            itemsToArchive = pd.DataFrame(args[1], columns=['Film Name', 'Film Budget', 'Box Office Rating'])
             itemsToArchive = itemsToArchive.reset_index()
             itemsToArchive.to_csv('filmDB_archive.csv', index=False, header=False, mode='a')
         else:
-            print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.")
+            print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.')
 
     # If wanting to restore an item
     elif args[0] == 'active':
         if os.path.exists('filmDB.csv'):
-            itemsToArchive = pd.DataFrame(args[1], columns=["Film Name", "Film Budget", "Box Office Rating"])
+            itemsToArchive = pd.DataFrame(args[1], columns=['Film Name', 'Film Budget', 'Box Office Rating'])
             itemsToArchive = itemsToArchive.reset_index()
             itemsToArchive.to_csv('filmDB.csv', index=False, header=False, mode='a')
         else:
-            print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
+            print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
 
 # Function used to wait for user input to return from their current activity and return to the menu.
 def pause():
     while True:
         try:
-            input(f"\n{HASH}Press enter to clear and return to menu.")
+            input(f'\n{HASH}Press enter to clear and return to menu.')
         except Exception as e:
-            print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
+            print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
             continue
         break
 
