@@ -4,14 +4,20 @@ Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Display a list of records and allow some added functionality
 '''
 
-import numpy as np
-import pandas as pd
-import csv
-import os
-import platform
-import sys
-from colorama import init, Fore
-from time import sleep
+# Attempt to import modules and throw error if they aren't installed.
+try:
+    import numpy as np
+    import pandas as pd
+    import csv
+    import os
+    import platform
+    import sys
+    from colorama import init, Fore
+    from time import sleep
+except ImportError:
+    print("Required dependencies are not installed.")
+    print("Run \'python3 -m pip install -r requirements.txt\' to install required modules.")
+    exit()
 
 # Constants
 ERROR = Fore.RED
@@ -50,7 +56,7 @@ def main_menu(*args):
         clearConsole = clearConsole.replace(",", "")
         os.system(str(clearConsole))
         print(f'''{TITLE}
-    ██╗  ██╗██╗███╗   ██╗███████╗███████╗    ██████╗ ██████╗ 
+    ██╗  ██╗██╗███╗   ██╗███████╗███████╗    ██████╗ ██████╗
     ██║  ██║██║████╗  ██║██╔════╝██╔════╝    ██╔══██╗██╔══██╗
     ███████║██║██╔██╗ ██║█████╗  ███████╗    ██║  ██║██████╔╝
     ██╔══██║██║██║╚██╗██║██╔══╝  ╚════██║    ██║  ██║██╔══██╗
@@ -110,38 +116,43 @@ def display(*arg):
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('active').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
-        print('Total budget loss:',)
-        print('')
+        print('Total budget loss:',get_budget_loss('active'),'\n')
+
     elif arg[0] == 'archive':
         titleColumn, budgetColumn, boxOfficeColumn = read_database('archive').columns
         print(f'\n{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
         print('---------------------------------------------------------')
         for (filmID, title, budget, boxOffice) in read_database('archive').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
-        print('')
+        print('\nTotal budget loss:',get_budget_loss('archive'),'\n')
 
 # Function to search for a row using the index.
 def search():
     while True:
         # Get item to search
         try:
-            value = input(f"{HASH}Enter the ID of the film you wish to search: ").upper().strip()
-        except Exception as e: # skipcq
+            value = input(f"{HASH}Enter the ID of the film you wish to search\n{HASH}Leave blank to cancel.\n{HASH}ID to search: ").upper().strip()
+        except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
-
             continue
-        try:
-            # Display searched item
-            titleColumn, budgetColumn, boxOfficeColumn = read_database('active').columns
-            print(f'\n{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
-            print('---------------------------------------------------------')
-            for (filmID, title, budget, boxOffice) in read_database('active').loc[[value]].itertuples(index=True):
-                print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
-                print('Total budget loss:')
-        except KeyError:
-            print(f"{MINUS}{ERROR}Error: Item not in list. Try again.{RESET}")
-            continue
-        break
+        # Check if value is blank and cancel search if it is.
+        if value == "":
+            break
+        else:
+            try:
+                # Force check the item actually exists to skip prints if KeyError. Takes longer but cleaner output.
+                read_database('active').loc[[value]].itertuples(index=True)
+                # Display searched item
+                titleColumn, budgetColumn, boxOfficeColumn = read_database('active').columns
+                print(f'\n{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
+                print('---------------------------------------------------------')
+                for (filmID, title, budget, boxOffice) in read_database('active').loc[[value]].itertuples(index=True):
+                    print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
+                print('\nFilm budget loss:',get_budget_loss('search', value),'\n')
+            except KeyError:
+                print(f"{MINUS}{ERROR}Error: Item not in database. Try again.{RESET}")
+                continue
+            break
 
 # Function to add an item to the database.
 def add_item():
@@ -180,15 +191,15 @@ def add_item():
 # Function to generate and return a new ID based on the largest known index.
 def gen_new_film_id():
     # Get databases and merge the FilmID columns.
-    df1 = read_database('active')
-    df2 = read_database('archive')
+    dataframe1 = read_database('active')
+    dataframe2 = read_database('archive')
 
-    df1 = df1.reset_index()
-    df2 = df2.reset_index()
+    dataframe1 = dataframe1.reset_index()
+    dataframe2 = dataframe2.reset_index()
 
-    df1 = np.array(df1)
-    df2 = np.array(df2)
-    mergedList = np.concatenate((df1[:,0], df2[:,0]))
+    dataframe1 = np.array(dataframe1)
+    dataframe2 = np.array(dataframe2)
+    mergedList = np.concatenate((dataframe1[:,0], dataframe2[:,0]))
 
     # Iterate through list and store the ID numbers only.
     for i in range(len(mergedList)):
@@ -208,7 +219,7 @@ def remove_item():
     while True:
         try:
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove: ").upper().strip()
-        except Exception as e: # skipcq
+        except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
 
             continue
@@ -216,27 +227,27 @@ def remove_item():
         if idToRemove == "":
             break
 
-        df1 = read_database('active')
-        df1 = df1.reset_index()
-        df1 = df1.values
-        if any(idToRemove in i for i in df1[:,0]):
+        dataframe1 = read_database('active')
+        dataframe1 = dataframe1.reset_index()
+        dataframe1 = dataframe1.values
+        if any(idToRemove in i for i in dataframe1[:,0]):
             while True:
                 try:
                     value = input(f"{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ").lower().strip()
-                except Exception as e: # skipcq
+                except Exception as e:
                     print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
                     continue
                 if value == "y":
                     # Read the database and convert it to a numpy array for manipulation
                     # Save the entry to the archive
-                    itemToArchive = np.copy(df1[np.where(df1 == idToRemove)[0]])
+                    itemToArchive = np.copy(dataframe1[np.where(dataframe1 == idToRemove)[0]])
                     # Convert back to dataframe
                     itemToArchive = pd.DataFrame(itemToArchive, columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
                     itemToArchive = itemToArchive.set_index(['Film ID'])
                     save('archive', itemToArchive)
                     # Remove the entry from the database and save.
-                    df1 = np.delete(df1, np.where(df1 == idToRemove)[0], axis=0)
-                    save('full', df1, 'full')
+                    dataframe1 = np.delete(dataframe1, np.where(dataframe1 == idToRemove)[0], axis=0)
+                    save('full', dataframe1, 'full')
                     print(f"\n{MINUS}Item removed!")
                     break
                 break  # Doesn't require 'else' statement. Can implicitly break here.
@@ -253,30 +264,30 @@ def restore_item():
     while True:
         try:
             idToRemove = input(f"{HASH}Enter the ID of the film you wish to restore: ").upper().strip()
-        except Exception as e: # skipcq
+        except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             continue
         while True:
             try:
                 value = input(f"{HASH}Are you sure you want to restore the film with ID {idToRemove}? (y/n): ").lower().strip()
-            except Exception as e: # skipcq
+            except Exception as e:
                 print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
                 continue
             if value == "y":
                 # Read the database and convert it to a numpy array for manipulation
-                df1 = read_database('archive')
-                df1 = df1.reset_index()
-                df1 = df1.values
-                if any(idToRemove in i for i in df1[:,0]):
+                dataframe1 = read_database('archive')
+                dataframe1 = dataframe1.reset_index()
+                dataframe1 = dataframe1.values
+                if any(idToRemove in i for i in dataframe1[:,0]):
                     # Save the entry to the active
-                    itemToArchive = np.copy(df1[np.where(df1 == idToRemove)[0]])
+                    itemToArchive = np.copy(dataframe1[np.where(dataframe1 == idToRemove)[0]])
                     # Convert back to dataframe
                     itemToArchive = pd.DataFrame(itemToArchive, columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
                     itemToArchive = itemToArchive.set_index(['Film ID'])
                     save('active', itemToArchive)
                     # Remove the entry from the archive and save.
-                    df1 = np.delete(df1, np.where(df1 == idToRemove)[0], axis=0)
-                    save('full', df1, 'archive')
+                    dataframe1 = np.delete(dataframe1, np.where(dataframe1 == idToRemove)[0], axis=0)
+                    save('full', dataframe1, 'archive')
                     print(f"\n{PLUS}Item restored!")
 
                     break
@@ -313,16 +324,37 @@ def read_database(*args):
 
 # Function to sort items by their Film ID.
 def sort_items():
-    df1 = read_database('active')
-    df2 = read_database('archive')
-    df1 = df1.sort_index()
-    df2 = df2.sort_index()
-    df1 = df1.reset_index()
-    df2 = df2.reset_index()
-    df1 = df1.values
-    df2 = df2.values
-    save('full', df1, 'full')
-    save('full', df2, 'archive')
+    dataframe1 = read_database('active')
+    dataframe2 = read_database('archive')
+    dataframe1 = dataframe1.sort_index()
+    dataframe2 = dataframe2.sort_index()
+    dataframe1 = dataframe1.reset_index()
+    dataframe2 = dataframe2.reset_index()
+    dataframe1 = dataframe1.values
+    dataframe2 = dataframe2.values
+    save('full', dataframe1, 'full')
+    save('full', dataframe2, 'archive')
+
+# Function to get budgets, box office ratings, and budget loss of films.
+def get_budget_loss(*args):
+    if args[0] == 'active':
+        totalBudget = read_database('active')['Film Budget'].sum()
+        totalBoxOffice = read_database('active')['Box Office Rating'].sum()
+        totalBudgetLoss = totalBudget - totalBoxOffice
+        return totalBudgetLoss
+    elif args[0] == 'archive':
+        totalBudget = read_database('archive')['Film Budget'].sum()
+        totalBoxOffice = read_database('archive')['Box Office Rating'].sum()
+        totalBudgetLoss = totalBudget - totalBoxOffice
+        return totalBudgetLoss
+    elif args[0] == 'search':
+        value = args[1]
+        filmBudget = read_database('active')['Film Budget'].loc[[value]].sum()
+        filmBoxOffice = read_database('active')['Box Office Rating'].loc[[value]].sum()
+        filmBudgetLoss = filmBudget - filmBoxOffice
+        return filmBudgetLoss
+    else:
+        print(f"{MINUS}{ERROR}Error: Invalid parameters parsed.{RESET}")
 
 # Function to save whatever dataframe is parsed.
 def save(*args):
@@ -378,7 +410,7 @@ def save(*args):
         if os.path.exists('filmDB.csv'):
             itemsToArchive = pd.DataFrame(args[1], columns=["Film Name", "Film Budget", "Box Office Rating"])
             itemsToArchive = itemsToArchive.reset_index()
-            itemsToArchive.to_csv('filmDB.csv', index=False, header=False, mode='a')    
+            itemsToArchive.to_csv('filmDB.csv', index=False, header=False, mode='a')
         else:
             print(f"{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.")
 
@@ -387,7 +419,7 @@ def pause():
     while True:
         try:
             input(f"\n{HASH}Press enter to clear and return to menu.")
-        except Exception as e: # skipcq
+        except Exception as e:
             print(f"{MINUS}{ERROR}Error: "+str(e)+f"{RESET}")
             continue
         break
