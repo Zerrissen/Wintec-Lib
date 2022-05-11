@@ -5,10 +5,6 @@ Description: Display a list of records and allow some added functionality
 '''
 
 # Attempt to import modules and throw error if they aren't installed.
-from re import L
-from sympy import true
-
-
 try:
     import numpy as np
     import pandas as pd
@@ -16,6 +12,7 @@ try:
     import os
     import platform
     import sys
+    from getpass import getpass
     from colorama import init, Fore, Style
     from time import sleep
 except ModuleNotFoundError as e:
@@ -47,6 +44,7 @@ TITLE = f'''{Fore.MAGENTA}
 ╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝    ╚═════╝ ╚═════╝\n{RESET}'''
 HASH = f'{RESET}[{YEL}#{RESET}] '
 MINUS = f'{RESET}[{RED}-{RESET}] '
+ERROR = f'{RESET}[{RED}!{RESET}] '
 PLUS = f'{RESET}[{GREEN}+{RESET}] '
 DEFAULT_LIST = pd.DataFrame([['FM01','Stealth', 135, 80], ['FM02','Supernova', 90, 15], ['FM03','Robin Hood', 100, 85], ['FM04','Rollerball', 70, 26], ['FM05','Rust', 85, 20]], columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
 
@@ -71,7 +69,7 @@ def main_menu():
                 # Implicitly convert value, otherwise except statement ignores creation of value.
                 value = int(value)
             except ArgumentTooBigError:
-                print(f'{MINUS}{RED}Error: \'{RESET}{value}{RED}\' has too many characters. Try again.{RESET}')
+                print(f'{ERROR}{RED}Error: \'{RESET}{value}{RED}\' has too many characters. Try again.{RESET}')
                 continue
             except ValueError:
                 if value == '':
@@ -125,7 +123,7 @@ def main_menu():
 
     # Catch keyboard interrupt (ctrl+c) at any stage in the program, and exit cleanly without lots of traceback messages.
     except KeyboardInterrupt:
-        print(f'\n{MINUS}{RED}Error: Keyboard Interrupt detected. Shutting down.')
+        print(f'\n{ERROR}{RED}Error: Keyboard Interrupt detected. Shutting down.')
 
 # Function to display the film database with formatted output.
 def display(*arg):
@@ -168,7 +166,7 @@ def search_for_film():
         try:
             value = input(f'{HASH}Enter the ID or Film Name you wish to search\n{HASH}Leave blank to cancel.\n{HASH}Search Value (ID format FMxx): {BRIGHT}').upper().strip()
         except Exception as e:
-            print(f'{MINUS}{RED}Error: '+str(e)+f'{RESET}')
+            print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
             continue
         # Check if value is blank and cancel search if it is.
         if value == '':
@@ -241,7 +239,7 @@ def search_for_film():
                         print('\nTotal budget loss: $' + str(total)+'M\n')
 
             except KeyError:
-                print(f'{MINUS}{RED}Error: Item not in database. Try again.{RESET}')
+                print(f'\n{ERROR}{RED}Error: Item not in database. Try again.{RESET}\n')
                 continue
             break
 
@@ -273,10 +271,10 @@ def add_item():
                     if value < 0:
                         raise LessThanZeroError
             except LessThanZeroError:
-                print(f'{MINUS}{RED}Error: \'{RESET}'+inputPrints[i]+f'{RED}\' Cannot be less than 0. Try again{RESET}')
+                print(f'{ERROR}{RED}Error: \'{RESET}'+inputPrints[i]+f'{RED}\' Cannot be less than 0. Try again{RESET}')
                 continue
             except ValueError:
-                print(f'{MINUS}{RED}Error: \'{RESET}'+str(value)+f'{RED}\' is not a valid number. Try again{RESET}')
+                print(f'{ERROR}{RED}Error: \'{RESET}'+str(value)+f'{RED}\' is not a valid number. Try again{RESET}')
                 continue
             newItems.append(value)
             inputsDone[i] = True
@@ -313,9 +311,9 @@ def gen_new_film_id(*args):
             with open('currentID.txt', 'w') as file:
                 file.write(str(currentID))
         except FileNotFoundError:
-            print(f'{MINUS}{RED}Error: File not found. Restart program to generate a new one.')
+            print(f'{ERROR}{RED}Error: File not found. Restart program to generate a new one.')
         except OSError:
-            print(f'{MINUS}{RED}Error: Encountered unknown error when attempting to read file.')
+            print(f'{ERROR}{RED}Error: Encountered unknown error when attempting to read file.')
 
         print(f'{PLUS}ID File generated!\n')
         sleep(1)
@@ -326,11 +324,11 @@ def gen_new_film_id(*args):
             with open('currentID.txt', 'r') as file:
                 data = file.read()
         except FileNotFoundError:
-            print(f'{MINUS}{RED}Error: File not found. Restart program to generate a new one.')
+            print(f'{ERROR}{RED}Error: File not found. Restart program to generate a new one.')
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permission to read file.')
+            print(f'{ERROR}{RED}Error: Insufficient permission to read file.')
         except OSError:
-            print(f'{MINUS}{RED}Error: Encountered unknown error when attempting to read file.')
+            print(f'{ERROR}{RED}Error: Encountered unknown error when attempting to read file.')
 
         # Get the highest number and +1 to it, giving a new ID.
         newID = int(data) + 1
@@ -339,9 +337,9 @@ def gen_new_film_id(*args):
                 file.write(str(newID))
             newID = f'FM{newID:02d}'
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permission to write file.')
+            print(f'{ERROR}{RED}Error: Insufficient permission to write file.')
         except OSError:
-            print(f'{MINUS}{RED}Error: Encountered unknown error when attempting to read file.')
+            print(f'{ERROR}{RED}Error: Encountered unknown error when attempting to read file.')
         return newID
 
 # Function that allows the user to archive any single entry.
@@ -356,7 +354,7 @@ def remove_item():
         try:
             idToRemove = input(f'{HASH}Enter the ID of the film you wish to archive\n{HASH}Leave blank to cancel.\n{HASH}Film to remove (Format FMxx): {BRIGHT}').upper().strip()
         except Exception as e:
-            print(f'{MINUS}{RED}Error: '+str(e)+f'{RESET}')
+            print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
             continue
         # If idToRemove is blank then break, otherwise continue
         if idToRemove == '':
@@ -372,7 +370,7 @@ def remove_item():
                         try:
                             value = input(f'{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): {BRIGHT}').lower().strip()
                         except Exception as e:
-                            print(f'{MINUS}{RED}Error: '+str(e)+f'{RESET}')
+                            print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
                             continue
                         if value == 'y':
                             # Read the database and convert it to a numpy array for manipulation
@@ -391,7 +389,7 @@ def remove_item():
             if itemFound == False:
                 raise KeyError
         except KeyError:
-            print(f'\n{MINUS}{RED}Error: Item \'{RESET}{idToRemove}{RED}\' does not exist. Try again.{RESET}\n')
+            print(f'\n{ERROR}{RED}Error: Item \'{RESET}{idToRemove}{RED}\' does not exist. Try again.{RESET}\n')
             sleep(2)
             continue
         break
@@ -407,7 +405,7 @@ def restore_item():
         try:
             idToRemove = input(f'{HASH}Enter the ID of the film you wish to restore\n{HASH}Leave blank to cancel\n{HASH}ID to restore (format FMxx): {BRIGHT}').upper().strip()
         except Exception as e:
-            print(f'{MINUS}{RED}Error: '+str(e)+f'{RESET}')
+            print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
             continue
         if idToRemove == '':
             break
@@ -415,7 +413,7 @@ def restore_item():
             try:
                 value = input(f'{HASH}Are you sure you want to restore the film with ID {idToRemove}? (y/n): {BRIGHT}').lower().strip()
             except Exception as e:
-                print(f'{MINUS}{RED}Error: '+str(e)+f'{RESET}')
+                print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
                 continue
             if value == 'y':
                 # Read the database and convert it to a numpy array for manipulation
@@ -464,9 +462,9 @@ def generate_default(*arg):
             print(f'{HASH}Film Database File not found. Generating default...')
             DEFAULT_LIST.to_csv('filmDB.csv', index=False, header=True, mode='w+')
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permissions to write file.')
+            print(f'{ERROR}{RED}Error: Insufficient permissions to write file.')
         except OSError:
-            print(f'{MINUS}{RED}Error: Unknown error when attempting to access file.')
+            print(f'{ERROR}{RED}Error: Unknown error when attempting to access file.')
         print(f'{PLUS}Film Database File generated!\n')
         sleep(1)
 
@@ -478,9 +476,9 @@ def generate_default(*arg):
                 csvWriter = csv.writer(filmDBArchive)
                 csvWriter.writerow(headers)
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permissions to write file.')
+            print(f'{ERROR}{RED}Error: Insufficient permissions to write file.')
         except OSError:
-            print(f'{MINUS}{RED}Error: Unknown error when attempting to access file.')
+            print(f'{ERROR}{RED}Error: Unknown error when attempting to access file.')
         print(f'{PLUS}Film Database Archive File generated!\n')
         sleep(1)
 
@@ -492,9 +490,9 @@ def read_database(*args):
         elif args[0] == 'archive':
             filmList = pd.read_csv('filmDB_archive.csv', header=0, index_col=0)
     except FileNotFoundError:
-        print(f'{MINUS}{RED}Error: File not found. Restart program to generate a new one.')
+        print(f'{ERROR}{RED}Error: File not found. Restart program to generate a new one.')
     except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+            print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
 
     return filmList
 
@@ -532,7 +530,7 @@ def get_budget_loss(*args):
         filmBudgetLoss = filmBudget - filmBoxOffice
         return filmBudgetLoss
     else:
-        print(f'{MINUS}{RED}Error: Invalid parameters parsed.{RESET}')
+        print(f'{ERROR}{RED}Error: Invalid parameters parsed.{RESET}')
 
 # Function to save whatever dataframe is parsed.
 def save(*args):
@@ -548,11 +546,11 @@ def save(*args):
                     else:
                         raise FileNotFoundError
                 except FileNotFoundError:
-                    print(f'{MINUS}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
+                    print(f'{ERROR}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
                 except PermissionError:
-                    print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+                    print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
                 except OSError:
-                    print(f'{MINUS}{RED}Error: Unknown error when attempting to write to file.')
+                    print(f'{ERROR}{RED}Error: Unknown error when attempting to write to file.')
             elif args[2] == 'archive':
                 try:
                     if os.path.exists('filmDB_archive.csv'):
@@ -561,9 +559,9 @@ def save(*args):
                     else:
                         raise FileNotFoundError
                 except FileNotFoundError:
-                    print(f'{MINUS}{RED}Error: \'{RESET}filmDB_archive.csv{RED}\' not found. Closing without saving.')
+                    print(f'{ERROR}{RED}Error: \'{RESET}filmDB_archive.csv{RED}\' not found. Closing without saving.')
                 except PermissionError:
-                    print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+                    print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
         else:
             try:
                 if os.path.exists('filmDB.csv'):
@@ -572,9 +570,9 @@ def save(*args):
                 else:
                     raise FileNotFoundError
             except FileNotFoundError:
-                print(f'{MINUS}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
+                print(f'{ERROR}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
             except PermissionError:
-                print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+                print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
             try:
                 if os.path.exists('filmDB_archive.csv'):
                     read_database('archive').to_csv('filmDB_archive.csv', index=True, header=True, mode='w')
@@ -582,9 +580,9 @@ def save(*args):
                 else:
                     raise FileNotFoundError
             except FileNotFoundError:
-                print(f'{MINUS}{RED}Error: \'{RESET}filmDB_archive.csv{RED}\' not found. Closing without saving.')
+                print(f'{ERROR}{RED}Error: \'{RESET}filmDB_archive.csv{RED}\' not found. Closing without saving.')
             except PermissionError:
-                print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+                print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
 
     # If wanting to add a new item
     elif args[0] == 'add':
@@ -597,11 +595,11 @@ def save(*args):
             else:
                 raise FileNotFoundError
         except FileNotFoundError:
-            print(f'{MINUS}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
+            print(f'{ERROR}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+            print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
         except OSError:
-            print(f'{MINUS}{RED}Error: Unknown error when attempting to write to file.')
+            print(f'{ERROR}{RED}Error: Unknown error when attempting to write to file.')
 
     # If wanting to archive an item
     elif args[0] == 'archive':
@@ -613,9 +611,9 @@ def save(*args):
             else:
                 raise FileNotFoundError
         except FileNotFoundError:
-            print(f'{MINUS}{RED}Error: \'{RESET}filmDB_archive.csv{RED}\' not found. Closing without saving.')
+            print(f'{ERROR}{RED}Error: \'{RESET}filmDB_archive.csv{RED}\' not found. Closing without saving.')
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+            print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
 
     # If wanting to restore an item
     elif args[0] == 'active':
@@ -627,17 +625,17 @@ def save(*args):
             else:
                 raise FileNotFoundError
         except FileNotFoundError:
-            print(f'{MINUS}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
+            print(f'{ERROR}{RED}Error: \'{RESET}filmDB.csv{RED}\' not found. Closing without saving.')
         except PermissionError:
-            print(f'{MINUS}{RED}Error: Insufficient permissions to write to file.')
+            print(f'{ERROR}{RED}Error: Insufficient permissions to write to file.')
 
 # Function used to wait for user input to return from their current activity and return to the menu.
 def pause():
     while True:
         try:
-            input(f'\n{HASH}Press enter to clear and return.')
+            getpass(f'\n{HASH}Press enter to clear and return.')
         except Exception as e:
-            print(f'{MINUS}{RED}Error: '+str(e)+f'{RESET}')
+            print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
             continue
         break
 
