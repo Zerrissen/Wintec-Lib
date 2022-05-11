@@ -14,12 +14,19 @@ try:
     import sys
     from colorama import init, Fore
     from time import sleep
-except ImportError as e:
+except ModuleNotFoundError as e:
     print(e)
     print('Run \'python3 -m pip install -r requirements.txt\' to install all required modules.')
     exit()
 
+# Custom exceptions
+class LessThanZeroError(Exception):
+    pass
+class ArgumentTooBigError(Exception):
+    pass
+
 # Constants
+BLUE = Fore.BLUE
 ERROR = Fore.RED
 INP = Fore.YELLOW
 RESET = Fore.RESET
@@ -31,7 +38,7 @@ TITLE = f'''{Fore.MAGENTA}
 ███████║██║██╔██╗ ██║█████╗  ███████╗    ██║  ██║██████╔╝
 ██╔══██║██║██║╚██╗██║██╔══╝  ╚════██║    ██║  ██║██╔══██╗
 ██║  ██║██║██║ ╚████║███████╗███████║    ██████╔╝██████╔╝
-╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝    ╚═════╝ ╚═════╝ \n{RESET}'''
+╚═╝  ╚═╝╚═╝╚═╝  ╚═══╝╚══════╝╚══════╝    ╚═════╝ ╚═════╝\n{RESET}'''
 HASH = f'{RESET}[{INP}#{RESET}] '
 MINUS = f'{RESET}[{ERROR}-{RESET}] '
 PLUS = f'{RESET}[{GOOD}+{RESET}] '
@@ -44,16 +51,18 @@ def main_menu():
         os.system(clearConsole)
         print(TITLE)
         print('Welcome to Hines Film Database! How can we help?')
-        print('\n\t[1]\tDisplay current film database')
-        print('\t[2]\tSearch for an item in the film database')
-        print('\t[3]\tAdd to current film database')
-        print('\t[4]\tRemove from current film database')
-        print('\t[5]\tRestore from archive database')
-        print('\t[6]\tDisplay help and program info')
-        print('\t[99]\tExit Application')
+        print(f'\n\t[{BLUE}1{RESET}]\tDisplay current film database')
+        print(f'\t[{BLUE}2{RESET}]\tSearch for an item in the film database')
+        print(f'\t[{BLUE}3{RESET}]\tAdd to current film database')
+        print(f'\t[{BLUE}4{RESET}]\tRemove from current film database')
+        print(f'\t[{BLUE}5{RESET}]\tRestore from archive database')
+        print(f'\t[{BLUE}6{RESET}]\tDisplay help and program info')
+        print(f'\t[{BLUE}99{RESET}]\t\Exit Application')
         while True:
             try:
                 value = input(f'\n{HASH}Enter your choice (1-99): ')
+                if len(value) > 2:
+                    raise ArgumentTooBigError
                 # Implicitly convert value, otherwise except statement ignores creation of value.
                 value = int(value)
             except ValueError:
@@ -63,6 +72,8 @@ def main_menu():
                 else:
                     print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' is not a valid choice. Try again.{RESET}')
                     continue
+            except ArgumentTooBigError:
+                print(f'{MINUS}{ERROR}Error: \'{RESET}{value}{ERROR}\' has too many characters. Try again.{RESET}')
             if value == 1:
                 # Other functions have the 'clearConsole' command and 'TITLE' print built-in.
                 # Display is called in other functions, hence implicit use.
@@ -118,7 +129,7 @@ def display(*arg):
         for (filmID, title, budget, boxOffice) in read_database('active').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
         if get_budget_loss('active') < 0:
-            print('\nTotal Profit: $' + str(abs(get_budget_loss('active')) + 'M\n'))
+            print('\nTotal Profit: $' + str(abs(get_budget_loss('active'))) + 'M\n')
         else:
             print('\nTotal budget loss: $' + str(get_budget_loss('active')) + 'M\n')
 
@@ -129,7 +140,7 @@ def display(*arg):
         for (filmID, title, budget, boxOffice) in read_database('archive').itertuples(index=True):
             print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
         if get_budget_loss('archive') < 0:
-            print('\nTotal Profit: $' + str(abs(get_budget_loss('archive')) + 'M\n'))
+            print('\nTotal Profit: $' + str(abs(get_budget_loss('archive'))) + 'M\n')
         else:
             print('\nTotal budget loss: $' + str(get_budget_loss('archive')) + 'M\n')
 
@@ -206,13 +217,14 @@ def add_item():
                     elif i == 1:
                         value = int(input(f'{HASH}Please enter the value for \'' + inputPrints[i]+ '\': '))
                         if value < 0:
-                            print(f'{MINUS}{ERROR}Error: \'{RESET}'+inputPrints[i]+f'{ERROR}\' Cannot be less than 0. Try again{RESET}')
-                            continue
+                            raise LessThanZeroError
                     elif i == 2:
                         value = int(input(f'{HASH}Please enter the value for \'' + inputPrints[i]+ '\': '))
                         if value < 0:
-                            print(f'{MINUS}{ERROR}Error: \'{RESET}'+inputPrints[i]+f'{ERROR}\' Cannot be less than 0. Try again{RESET}')
-                            continue
+                            raise LessThanZeroError
+                except LessThanZeroError:
+                    print(f'{MINUS}{ERROR}Error: \'{RESET}'+inputPrints[i]+f'{ERROR}\' Cannot be less than 0. Try again{RESET}')
+                    continue
                 except ValueError:
                     print(f'{MINUS}{ERROR}Error: \'{RESET}'+str(value)+f'{ERROR}\' is not a valid number. Try again{RESET}')
                     continue
@@ -225,29 +237,64 @@ def add_item():
     sort_items()
 
 # Function to generate and return a new ID based on the largest known index.
-def gen_new_film_id():
-    # Get databases and merge the FilmID columns.
-    dataframe1 = read_database('active')
-    dataframe2 = read_database('archive')
+def gen_new_film_id(*args):
+    # If the currentID.txt file is missing, merge databases and create a new one (slow but necessary)
+    if any(args):
+        print(f'{HASH}ID File not found. Generating a new one... THIS MAY TAKE TIME DEPENDING ON DB SIZE')
+        # Get databases and merge the FilmID columns.
+        dataframe1 = read_database('active')
+        dataframe2 = read_database('archive')
 
-    dataframe1 = dataframe1.reset_index()
-    dataframe2 = dataframe2.reset_index()
+        dataframe1 = dataframe1.reset_index()
+        dataframe2 = dataframe2.reset_index()
 
-    dataframe1 = np.array(dataframe1)
-    dataframe2 = np.array(dataframe2)
-    mergedList = np.concatenate((dataframe1[:,0], dataframe2[:,0]))
+        dataframe1 = np.array(dataframe1)
+        dataframe2 = np.array(dataframe2)
+        mergedList = np.concatenate((dataframe1[:,0], dataframe2[:,0]))
 
-    # Iterate through list and store the ID numbers only.
-    for i in range(len(mergedList)):
-        numFilter = filter(str.isdigit, mergedList[i])
-        numString = ''.join(numFilter)
-        mergedList[i] = int(numString)
+        # Iterate through list and store the ID numbers only.
+        for i in range(len(mergedList)):
+            numFilter = filter(str.isdigit, mergedList[i])
+            numString = ''.join(numFilter)
+            mergedList[i] = int(numString)
 
-    # Get the highest number and +1 to it, giving a new ID.
-    newID = np.amax(mergedList) + 1
-    newID = f'FM{newID:02d}'
+        # Get the highest number and +1 to it, giving a new ID.
+        currentID = np.amax(mergedList)
+        try:
+            with open('currentID.txt', 'w') as file:
+                file.write(str(currentID))
+        except FileNotFoundError:
+            print(f'{MINUS}{ERROR}Error: File not found. Restart program to generate a new one.')
+        except OSError:
+            print(f'{MINUS}{ERROR}Error: Encountered unknown error when attempting to read file.')
 
-    return newID
+        print(f'{PLUS}ID File generated!\n')
+        sleep(1)
+
+    # If the currentID.txt file is available, just use this! WAY faster during program use!
+    else:
+        try:
+            with open('currentID.txt', 'r') as file:
+                data = file.read()
+        except FileNotFoundError:
+            print(f'{MINUS}{ERROR}Error: File not found. Restart program to generate a new one.')
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permission to read file.')
+        except OSError:
+            print(f'{MINUS}{ERROR}Error: Encountered unknown error when attempting to read file.')
+
+        # Get the highest number and +1 to it, giving a new ID.
+        newID = int(data) + 1
+        try:
+            with open('currentID.txt', 'w') as file:
+                file.write(str(newID))
+
+            newID = f'FM{newID:02d}'
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permission to write file.')
+        except OSError:
+            print(f'{MINUS}{ERROR}Error: Encountered unknown error when attempting to read file.')
+        return newID
 
 # Function that allows the user to archive any single entry.
 def remove_item():
@@ -268,30 +315,33 @@ def remove_item():
         dataframe1 = read_database('active')
         dataframe1 = dataframe1.reset_index()
         dataframe1 = dataframe1.values
-        for i in dataframe1[:,0]:
-            if i == idToRemove:
-                itemFound = True
-                while True:
-                    try:
-                        value = input(f'{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ').lower().strip()
-                    except Exception as e:
-                        print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
-                        continue
-                    if value == 'y':
-                        # Read the database and convert it to a numpy array for manipulation
-                        # Save the entry to the archive
-                        itemToArchive = np.copy(dataframe1[np.where(dataframe1 == idToRemove)[0]])
-                        # Convert back to dataframe
-                        itemToArchive = pd.DataFrame(itemToArchive, columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
-                        itemToArchive = itemToArchive.set_index(['Film ID'])
-                        save('archive', itemToArchive)
-                        # Remove the entry from the database and save.
-                        dataframe1 = np.delete(dataframe1, np.where(dataframe1 == idToRemove)[0], axis=0)
-                        save('full', dataframe1, 'full')
-                        print(f'\n{MINUS}Item removed!')
-                        break
-                    break  # Doesn't require 'else' statement. Can implicitly break here.
-        if itemFound == False:
+        try:
+            for i in dataframe1[:,0]:
+                if i == idToRemove:
+                    itemFound = True
+                    while True:
+                        try:
+                            value = input(f'{HASH}Are you sure you want to archive the film with ID {idToRemove}? (y/n): ').lower().strip()
+                        except Exception as e:
+                            print(f'{MINUS}{ERROR}Error: '+str(e)+f'{RESET}')
+                            continue
+                        if value == 'y':
+                            # Read the database and convert it to a numpy array for manipulation
+                            # Save the entry to the archive
+                            itemToArchive = np.copy(dataframe1[np.where(dataframe1 == idToRemove)[0]])
+                            # Convert back to dataframe
+                            itemToArchive = pd.DataFrame(itemToArchive, columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
+                            itemToArchive = itemToArchive.set_index(['Film ID'])
+                            save('archive', itemToArchive)
+                            # Remove the entry from the database and save.
+                            dataframe1 = np.delete(dataframe1, np.where(dataframe1 == idToRemove)[0], axis=0)
+                            save('full', dataframe1, 'full')
+                            print(f'\n{MINUS}Item removed!')
+                            break
+                        break  # Doesn't require 'else' statement. Can implicitly break here.
+            if itemFound == False:
+                raise KeyError
+        except KeyError:
             print(f'\n{MINUS}{ERROR}Error: Item \'{RESET}{idToRemove}{ERROR}\' does not exist. Try again.{RESET}\n')
             sleep(2)
             continue
@@ -361,25 +411,41 @@ def help_and_info():
 # Function to generate default database for first program running or database deletion.
 def generate_default(*arg):
     if arg[0] == 'active':
-        print(f'{HASH}Film Database File not found. Generating default...')
-        DEFAULT_LIST.to_csv('filmDB.csv', index=False, header=True, mode='w+')
+        try:
+            print(f'{HASH}Film Database File not found. Generating default...')
+            DEFAULT_LIST.to_csv('filmDB.csv', index=False, header=True, mode='w+')
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permissions to write file.')
+        except OSError:
+            print(f'{MINUS}{ERROR}Error: Unknown error when attempting to access file.')
         print(f'{PLUS}Film Database File generated!\n')
         sleep(1)
+
     elif arg[0] == 'archive':
         print(f'{HASH}Film Database Archive File not found. Generating default...')
         headers = ['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating']
-        with open('filmDB_archive.csv', 'a') as filmDBArchive:
-            csvWriter = csv.writer(filmDBArchive)
-            csvWriter.writerow(headers)
+        try:
+            with open('filmDB_archive.csv', 'w') as filmDBArchive:
+                csvWriter = csv.writer(filmDBArchive)
+                csvWriter.writerow(headers)
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permissions to write file.')
+        except OSError:
+            print(f'{MINUS}{ERROR}Error: Unknown error when attempting to access file.')
         print(f'{PLUS}Film Database Archive File generated!\n')
         sleep(1)
 
 # Function to open the database and return its current structure, used during database modification and reading.
 def read_database(*args):
-    if args[0] == 'active':
-        filmList = pd.read_csv('filmDB.csv', header=0, index_col=0)
-    elif args[0] == 'archive':
-        filmList = pd.read_csv('filmDB_archive.csv', header=0, index_col=0)
+    try:
+        if args[0] == 'active':
+            filmList = pd.read_csv('filmDB.csv', header=0, index_col=0)
+        elif args[0] == 'archive':
+            filmList = pd.read_csv('filmDB_archive.csv', header=0, index_col=0)
+    except FileNotFoundError:
+        print(f'{MINUS}{ERROR}Error: File not found. Restart program to generate a new one.')
+    except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
 
     return filmList
 
@@ -426,56 +492,95 @@ def save(*args):
         # Check if data has been parsed. If not, then re-write the current active database.
         if len(args) == 3:
             if args[2] == 'full':
-                if os.path.exists('filmDB.csv'):
-                    newItems = pd.DataFrame(list(args[1]), columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
-                    newItems.to_csv('filmDB.csv', index=False, header=True, mode='w')
-                else:
+                try:
+                    if os.path.exists('filmDB.csv'):
+                        newItems = pd.DataFrame(list(args[1]), columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
+                        newItems.to_csv('filmDB.csv', index=False, header=True, mode='w')
+                    else:
+                        raise FileNotFoundError
+                except FileNotFoundError:
                     print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
+                except PermissionError:
+                    print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
+                except OSError:
+                    print(f'{MINUS}{ERROR}Error: Unknown error when attempting to write to file.')
             elif args[2] == 'archive':
-                if os.path.exists('filmDB_archive.csv'):
-                    restoredItems = pd.DataFrame(list(args[1]), columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
-                    restoredItems.to_csv('filmDB_archive.csv', index=False, header=True, mode='w')
-                else:
+                try:
+                    if os.path.exists('filmDB_archive.csv'):
+                        restoredItems = pd.DataFrame(list(args[1]), columns=['Film ID', 'Film Name', 'Film Budget', 'Box Office Rating'])
+                        restoredItems.to_csv('filmDB_archive.csv', index=False, header=True, mode='w')
+                    else:
+                        raise FileNotFoundError
+                except FileNotFoundError:
                     print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.')
+                except PermissionError:
+                    print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
         else:
-            if os.path.exists('filmDB.csv'):
-                read_database('active').to_csv('filmDB.csv', index=True, header=True, mode='w')
-                print(f'{PLUS}Database saved!')
-            else:
+            try:
+                if os.path.exists('filmDB.csv'):
+                    read_database('active').to_csv('filmDB.csv', index=True, header=True, mode='w')
+                    print(f'{PLUS}Database saved!')
+                else:
+                    raise FileNotFoundError
+            except FileNotFoundError:
                 print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
-            if os.path.exists('filmDB_archive.csv'):
-                read_database('archive').to_csv('filmDB_archive.csv', index=True, header=True, mode='w')
-                print(f'{PLUS}Archive saved!')
-            else:
+            except PermissionError:
+                print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
+            try:
+                if os.path.exists('filmDB_archive.csv'):
+                    read_database('archive').to_csv('filmDB_archive.csv', index=True, header=True, mode='w')
+                    print(f'{PLUS}Archive saved!')
+                else:
+                    raise FileNotFoundError
+            except FileNotFoundError:
                 print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.')
+            except PermissionError:
+                print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
 
     # If wanting to add a new item
     elif args[0] == 'add':
-        if os.path.exists('filmDB.csv'):
-            newItems = list(args[1])
-            with open('filmDB.csv', 'a', newline='\n') as filmDB:
-                csvWriter = csv.writer(filmDB)
-                csvWriter.writerow(newItems)
-        else:
+        try:
+            if os.path.exists('filmDB.csv'):
+                newItems = list(args[1])
+                with open('filmDB.csv', 'a', newline='\n') as filmDB:
+                    csvWriter = csv.writer(filmDB)
+                    csvWriter.writerow(newItems)
+            else:
+                raise FileNotFoundError
+        except FileNotFoundError:
             print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
+        except OSError:
+            print(f'{MINUS}{ERROR}Error: Unknown error when attempting to write to file.')
 
     # If wanting to archive an item
     elif args[0] == 'archive':
-        if os.path.exists('filmDB_archive.csv'):
-            itemsToArchive = pd.DataFrame(args[1], columns=['Film Name', 'Film Budget', 'Box Office Rating'])
-            itemsToArchive = itemsToArchive.reset_index()
-            itemsToArchive.to_csv('filmDB_archive.csv', index=False, header=False, mode='a')
-        else:
+        try:
+            if os.path.exists('filmDB_archive.csv'):
+                itemsToArchive = pd.DataFrame(args[1], columns=['Film Name', 'Film Budget', 'Box Office Rating'])
+                itemsToArchive = itemsToArchive.reset_index()
+                itemsToArchive.to_csv('filmDB_archive.csv', index=False, header=False, mode='a')
+            else:
+                raise FileNotFoundError
+        except FileNotFoundError:
             print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB_archive.csv{ERROR}\' not found. Closing without saving.')
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
 
     # If wanting to restore an item
     elif args[0] == 'active':
-        if os.path.exists('filmDB.csv'):
-            itemsToArchive = pd.DataFrame(args[1], columns=['Film Name', 'Film Budget', 'Box Office Rating'])
-            itemsToArchive = itemsToArchive.reset_index()
-            itemsToArchive.to_csv('filmDB.csv', index=False, header=False, mode='a')
-        else:
+        try:
+            if os.path.exists('filmDB.csv'):
+                itemsToArchive = pd.DataFrame(args[1], columns=['Film Name', 'Film Budget', 'Box Office Rating'])
+                itemsToArchive = itemsToArchive.reset_index()
+                itemsToArchive.to_csv('filmDB.csv', index=False, header=False, mode='a')
+            else:
+                raise FileNotFoundError
+        except FileNotFoundError:
             print(f'{MINUS}{ERROR}Error: \'{RESET}filmDB.csv{ERROR}\' not found. Closing without saving.')
+        except PermissionError:
+            print(f'{MINUS}{ERROR}Error: Insufficient permissions to write to file.')
 
 # Function used to wait for user input to return from their current activity and return to the menu.
 def pause():
@@ -497,7 +602,7 @@ if __name__ == '__main__':
     else:
         clearConsole = 'clear'
 
-    # Check if database already exists. If not, create one.
+    # Check if files already exist. If not, create them.
     if os.path.exists('filmDB.csv'):
         pass
     else:
@@ -506,6 +611,10 @@ if __name__ == '__main__':
         pass
     else:
         generate_default('archive')
+    if os.path.exists('currentID.txt'):
+        pass
+    else:
+        gen_new_film_id('missing')
 
     # Begin main function.
     main_menu()
