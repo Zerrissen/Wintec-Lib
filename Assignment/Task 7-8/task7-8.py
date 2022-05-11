@@ -168,7 +168,7 @@ def search_for_film():
         except Exception as e:
             print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
             continue
-        # Check if value is blank and cancel search if it is.
+        # Check if value is blank and cancel search if is.
         if value == '':
             break
         else:
@@ -178,7 +178,7 @@ def search_for_film():
                 # If not a valid ID, start searching by name. Will KeyError if not a valid name either.
                 filmByName = read_database('active')['Film Name'].str.contains(value, regex=False, case=False)
                 filmByName = filmByName[filmByName].index.values
-                if len(filmByName) == 0:
+                if len(filmByName) == 0 and isID == False:
                     raise KeyError
                 else:
                     foundByName = True
