@@ -78,46 +78,49 @@ def main_menu():
                 else:
                     print(f'{MINUS}{RED}Error: \'{RESET}{value}{RED}\' is invalid input. Try again.{RESET}')
                     continue
-            if value == 1:
-                # Other functions have the 'clearConsole' command and 'TITLE' print built-in.
-                # Display is called in other functions, hence implicit use.
-                os.system(str(clearConsole))
-                print(TITLE)
-                print(f'{HASH}Database Display selected!')
-                display()
-                pause()
-                break
-            elif value == 2:
-                search_for_film()
-                pause()
-                break
-            elif value == 3:
-                add_item()
-                pause()
-                break
-            elif value == 4:
-                remove_item()
-                pause()
-                break
-            elif value == 5:
-                restore_item()
-                pause()
-                break
-            elif value == 6:
-                help_and_info()
-                pause()
-                break
-            # '99' is used here so that the user has to give intent to exit, following Nielsen's 10 Heuristics.
-            elif value == 99:
-                print(f'\n{HASH}Saving database and closing program...')
-                save('full')
-                print(f'{HASH}Closing program.')
-                sleep(2)
-                # Exit program
-                sys.exit(0)
-            # Fallback 'else' in event input is a valid integer but not valid choice.
-            else:
-                raise ValueError
+            try:
+                if value == 1:
+                    # Other functions have the 'clearConsole' command and 'TITLE' print built-in.
+                    # Display is called in other functions, hence implicit use.
+                    os.system(str(clearConsole))
+                    print(TITLE)
+                    print(f'{HASH}Database Display selected!')
+                    display()
+                    pause()
+                    break
+                elif value == 2:
+                    search_for_film()
+                    pause()
+                    break
+                elif value == 3:
+                    add_item()
+                    pause()
+                    break
+                elif value == 4:
+                    remove_item()
+                    pause()
+                    break
+                elif value == 5:
+                    restore_item()
+                    pause()
+                    break
+                elif value == 6:
+                    help_and_info()
+                    pause()
+                    break
+                # '99' is used here so that the user has to give intent to exit, following Nielsen's 10 Heuristics.
+                elif value == 99:
+                    print(f'\n{HASH}Saving database and closing program...')
+                    save('full')
+                    print(f'{HASH}Closing program.')
+                    sleep(2)
+                    # Exit program
+                    sys.exit(0)
+                # Fallback 'else' in event input is a valid integer but not valid choice.
+                else:
+                    raise ValueError
+            except ValueError:
+                print(f'{MINUS}{RED}Error: \'{RESET}{value}{RED}\' is invalid input. Try again.{RESET}')
         # Restart function outside of while loop
         main_menu()
 
@@ -158,8 +161,8 @@ def search_for_film():
     print(TITLE)
     print(f'{HASH}Search Database selected!\n')
     while True:
-        # Flags used to check whether the search value is an ID or a film name.
-        isID = False
+        # Boolean flags used to check whether the search value is an ID or a film name.
+        foundByID = False
         foundByName = False
         total = 0
         # Get item to search
@@ -174,12 +177,19 @@ def search_for_film():
         else:
             try:
                 # Check whether the search is a valid ID or not.
-                isID = value in read_database('active').index
+                foundByID = value in read_database('active').index
                 # If not a valid ID, start searching by name. Will KeyError if not a valid name either.
                 filmByName = read_database('active')['Film Name'].str.contains(value, regex=False, case=False)
                 filmByName = filmByName[filmByName].index.values
-                if len(filmByName) == 0 and isID == False:
-                    raise KeyError
+                # If it's not found by the name or ID, raise error, otherwise it has been found by name.
+                if len(filmByName) == 0 and foundByID == False:
+                    if check_if_archived(value) == True:
+                        print(f'{RESET}Item may be in archive as the searched ID is less than the greatest known ID.')
+                        break
+                    elif check_if_archived(value) == 'LessThanZero':
+                        raise LessThanZeroError
+                    else:
+                        raise KeyError
                 else:
                     foundByName = True
 
@@ -188,7 +198,7 @@ def search_for_film():
                 print(f'\n{RESET}{"Film ID":<10}{titleColumn:<15}{budgetColumn:<15}{boxOfficeColumn}')
                 print('---------------------------------------------------------')
                 # If found by both ID and name
-                if isID == True and foundByName == True:
+                if foundByID == True and foundByName == True:
                     # Make sure that the film name isn't the same as it's own ID! otherwise it might print both....
                     if not value in filmByName:
                         # Print all the ID found films first
@@ -218,7 +228,7 @@ def search_for_film():
                             print('\nFilm budget loss: $' + str(get_budget_loss('search', value))+'M\n')
 
                 # If only found by ID
-                elif isID == True and foundByName == False:
+                elif foundByID == True and foundByName == False:
                     for (filmID, title, budget, boxOffice) in read_database('active').loc[[value]].itertuples(index=True):
                         print(f'{filmID:<10}{title:<15}{budget:<15}{boxOffice}')
                         if get_budget_loss('search', value) < 0:
@@ -237,7 +247,9 @@ def search_for_film():
                         print('\nTotal Proft: $' + str(abs(total)) + 'M\n')
                     else:
                         print('\nTotal budget loss: $' + str(total)+'M\n')
-
+            except LessThanZeroError:
+                print(f'\n{ERROR}{RED}Error: \'{RESET}Film ID{RED}\' Cannot be less than 0. Try again.{RESET}\n')
+                continue
             except KeyError:
                 print(f'\n{ERROR}{RED}Error: Item not in database. Try again.{RESET}\n')
                 continue
@@ -454,6 +466,38 @@ def help_and_info():
     print('Unless you edit the files themselves, you will not lose any added records\nas per good database management!')
     print('\n! Links !')
     print(f'GitHub: {CYAN}https://github.com/zerrissen/{RESET}\nEmail: {CYAN}nathin18@student.wintec.ac.nz{RESET}')
+
+# Function that uses the current largest known ID to see if the searched ID is archived or not.
+def check_if_archived(searchedID):
+    try:
+        with open('currentID.txt', 'r') as file:
+            data = file.read()
+    except FileNotFoundError:
+        print(f'{ERROR}{RED}Error: File not found. Restart program to generate a new one.')
+    except PermissionError:
+        print(f'{ERROR}{RED}Error: Insufficient permission to read file.')
+    except OSError:
+        print(f'{ERROR}{RED}Error: Encountered unknown error when attempting to read file.')
+    currentID = int(data)
+    try:
+        if not 'FM' in searchedID:
+            return False
+        if not '-' in searchedID:
+            numFilter = filter(str.isdigit, searchedID)
+            numString = ''.join(numFilter)
+            searchedID = int(numString)
+        else:
+            raise LessThanZeroError
+    except LessThanZeroError:
+        return 'LessThanZero'
+    except Exception as e:
+        print(f'{ERROR}{RED}Error: '+str(e)+f'{RESET}')
+        return False
+
+    if searchedID <= currentID:
+        print(searchedID)
+        return True
+    return False
 
 # Function to generate default database for first program running or database deletion.
 def generate_default(*arg):
