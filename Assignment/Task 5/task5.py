@@ -4,7 +4,13 @@ Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Determine grocery discount eligibility
 '''
 
-from colorama import init, Fore
+# Attempt to import modules and throw error if they aren't installed.
+try:
+    from colorama import init, Fore
+except ModuleNotFoundError as e:
+    print(e)
+    print('Run \'python3 -m pip install -r requirements.txt\' to install all required modules.')
+    exit() # use the python built-in method of exiting as sys hasn't been imported here. Messy exit but works.
 
 # Constants for colors
 ERROR = Fore.RED
