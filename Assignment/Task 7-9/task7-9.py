@@ -2,6 +2,9 @@
 Author: Nathan Hines 21523561
 Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Display a list of records and allow some added functionality
+
+Note: make sure you run the following command before running the program:
+python3 -m pip install -r requirements.txt
 '''
 
 # Attempt to import modules and throw error if they aren't installed.
@@ -63,7 +66,7 @@ def main_menu():
         print(f'\t[{BLUE}99{RESET}]\tExit Application')
         while True:
             try:
-                value = input(f'\n{HASH}Enter your choice (1-99): {BRIGHT}')
+                value = input(f'\n{HASH}Enter your choice (1-99): {BRIGHT}').strip()
                 if len(value) > 2 and value.isnumeric():
                     raise ArgumentTooBigError
                 # Implicitly convert value, otherwise except statement ignores creation of value.
