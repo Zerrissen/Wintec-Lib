@@ -1,0 +1,8 @@
+67.5,23,red
+12,92.7,green
+43,79,blue
+5.4,83.9,purple
+12.5,81.8,pink
+20.6,62.3,brindle
+107,28.8,white
+80,48.5,black
