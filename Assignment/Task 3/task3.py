@@ -3,7 +3,14 @@ Author: Nathan Hines 21523561
 Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Display formatted text using OUT inputs.
 '''
-from colorama import init, Fore
+
+# Attempt to import modules and throw error if they aren't installed.
+try:
+    from colorama import init, Fore
+except ModuleNotFoundError as e:
+    print(e)
+    print('Run \'python3 -m pip install -r requirements.txt\' to install all required modules.')
+    exit() # use the python built-in method of exiting as sys hasn't been imported here. Messy exit but works.
 
 # Constants for colors
 ERROR = Fore.RED
@@ -14,9 +21,9 @@ INPUT_PRINTS = [f"{OUT}Weekday hours worked: {RESET}", f"{OUT}Weekend hours work
 # Function to get user input
 def get_worker_values():
     inputsDone = [False, False, False]
-    for i in enumerate(INPUT_PRINTS): # Only needs one while loop! Yay! Better UX!
+    for i in range(len(INPUT_PRINTS)): # Only needs one while loop! Yay! Better UX!
         while sum(inputsDone) != len(inputsDone):
-            if inputsDone[i] is False:
+            if inputsDone[i] == False:
                 try:
                     value = float(input(INPUT_PRINTS[i]))
                 except ValueError:

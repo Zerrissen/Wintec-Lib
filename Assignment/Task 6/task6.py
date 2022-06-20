@@ -1,11 +1,17 @@
-'''PLUS = f"{RESET}[{GOOD}+{RESET}] "cle
+'''
 Author: Nathan Hines 21523561
 Pledge of Honour: I pledge by honour that this program is solely my own work.
 Description: Use a loop to draw a pattern of circles
 '''
 
-from colorama import init, Fore
-from turtle import speed, pu, goto, pd, fillcolor, begin_fill, circle, end_fill, left, fd, exitonclick
+# Attempt to import modules and throw error if they aren't installed.
+try:
+    from colorama import init, Fore
+    from turtle import speed, pu, goto, pd, fillcolor, begin_fill, circle, end_fill, left, fd, exitonclick
+except ModuleNotFoundError as e:
+    print(e)
+    print('Run \'python3 -m pip install -r requirements.txt\' to install all required modules.')
+    exit() # use the python built-in method of exiting as sys hasn't been imported here. Messy exit but works.
 
 # Constants
 ERROR = Fore.RED
