@@ -1,0 +1,66 @@
+html, body {
+    max-width:100%;
+    overflow-x: hidden;
+}
+
+body {
+    background-color:rgb(107, 161, 91);
+}
+
+.container-fluid {
+    padding-right: 0px;
+    padding-left: 0px;
+}
+
+
+.title {
+    background-color:rgb(122, 162, 201);
+}
+
+.title h1 {
+    margin-top: 10px;
+    margin-left: 45px;
+}
+
+.title h5 {
+    margin-top: 0px;
+    margin-left: 90px;
+    color: white;
+}
+
+.navbar .navbar-nav .nav-item a {
+    color: black;
+    text-align: center;
+    padding-right: 35px;
+    padding-left: 35px;
+}
+
+.navbar .navbar-nav .nav-item a:hover {
+    background-color: #d4d4d4;
+}
+
+.navbar {
+    background-color:rgb(152, 180, 218);
+}
+
+#subtitle {
+    color:white;
+    margin:0;
+}
+
+.main-content {
+    background-color: rgb(136, 202, 116);
+    height: 100%;
+    padding-bottom: 386px;
+    margin-top: 8px;
+}
+
+.article h3 {
+    color:rgb(40, 62, 85);
+    margin-top: 20px;
+    margin-left: 25px;
+}
+
+.article p {
+    margin: 25px;
+}
