@@ -1,18 +1,25 @@
 public class Note {
-    String notePitch;
-    int noteDuration;
+    private String pitch;
+    private int duration;
 
     public Note(String pitch, int duration) {
-        notePitch = pitch;
-        noteDuration = duration;
+        setPitch(pitch);
+        setDuration(duration);
     }
 
-    // Get Note object pitch and duration and return it
-    public String getNotePitch() {
-        return notePitch;
+    public void setDuration(int duration) {
+        this.duration = duration;
     }
 
-    public int getNoteDuration() {
-        return noteDuration;
+    public void setPitch(String pitch) {
+        this.pitch = pitch;
+    }
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public String getPitch() {
+        return pitch;
     }
 }

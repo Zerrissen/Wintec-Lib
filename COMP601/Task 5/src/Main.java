@@ -1,5 +1,5 @@
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,11 +12,16 @@ public class Main {
         notes.add(new Note("F", 13));
         notes.add(new Note("B", 34));
         notes.add(new Note("C", 53));
-        processNotes(notes);
-    }// end of main method
 
-    public static void processNotes(List<Note> notes) {
-        // print the fourth note
-        System.out.println(notes.get(3));
+        processNotes(notes);
+        // print the sum of notes duration
     }
-}// end of class Main
+
+    private static void processNotes(List<Note> notes) {
+        for (Note note : notes) {
+            System.out.println("The note " + note.getPitch() + " is played for " + note.getDuration() + " seconds");
+        }
+
+        System.out.println("\nTotal duration: " + notes.stream().mapToInt(Note::getDuration).sum() + " seconds");
+    }
+}
