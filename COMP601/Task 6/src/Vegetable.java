@@ -10,12 +10,12 @@ public class Vegetable {
     }
 
     // set method to set weight
-    public void setWeight(double weight) {
+    private void setWeight(double weight) {
         this.weight = weight;
     }
 
     // set method to set price
-    public void setPrice(double price) {
+    private void setPrice(double price) {
         this.price = price;
     }
 

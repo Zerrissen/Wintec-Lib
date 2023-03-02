@@ -7,7 +7,7 @@ public class LeafyGreen extends Vegetable {
     }
 
     // set method for vegetable type
-    public void setType(String type) {
+    private void setType(String type) {
         this.type = type;
     }
 
