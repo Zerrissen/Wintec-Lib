@@ -1,0 +1,6 @@
+New Zealand,Wellington,5
+India,New Delhi,1380
+Germany,Berlin,83
+Thailand,Bangkok,69
+Greece,Athens,10
+Netherlands,Amsterdam,17
