@@ -16,7 +16,7 @@ public class Country {
     private void setCapital(String capital) {
         this.capital = capital;
     }
- 
+
     private void setPopulation(int population) {
         this.population = population;
     }

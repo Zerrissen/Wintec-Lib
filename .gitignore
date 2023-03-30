@@ -1,2 +1,8 @@
 .vscode/
 *.code-profile
+
+.dockerignore
+Dockerfile
+
+lib/
+bin/

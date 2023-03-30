@@ -1,7 +1,7 @@
 import java.io.IOException;
 
 public class App {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws IOException {
         String dataFile = "../data/data.txt";
         System.out.println("Importing data..");
         try {

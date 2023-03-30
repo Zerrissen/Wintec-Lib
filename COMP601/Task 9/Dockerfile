@@ -6,5 +6,3 @@ COPY . /usr/src/JavaApp
 WORKDIR /usr/src/JavaApp/src
 RUN javac App.java
 CMD ["java", "App"]
-# For Spring-Boot project, use the entrypoint below to reduce Tomcat startup time.
-#ENTRYPOINT exec java $JAVA_OPTS -Djava.security.egd=file:/dev/./urandom -jar task8.jar

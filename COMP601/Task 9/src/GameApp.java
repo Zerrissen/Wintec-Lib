@@ -10,6 +10,7 @@ import java.util.Scanner;
 public class GameApp {
     Scanner scanner = new Scanner(System.in);
     private List<Country> countryList;
+
     public GameApp(String dataFile) throws IOException {
         readData(dataFile);
     }
@@ -27,22 +28,37 @@ public class GameApp {
         }
     }
 
-    public void game(){
-        int randomInt = ThreadLocalRandom.current().nextInt(0,countryList.size());
-        Country randomObj = countryList.get(randomInt);
-        String capitalAnswer = randomObj.getCapital();
-        String countryName = randomObj.getName();
-        System.out.println("What is the capital of " + countryName + ": ");
-        String userAnswer = scanner.nextLine();
-        if (userAnswer.equals(capitalAnswer)) {
-            System.out.println("Correct! " + countryName + " is a country of " + randomObj.getPopulation() +" million.");
-        } else {
-            System.out.println("Wrong..");
-        }
-        System.out.println("Continue? (Y/N): ");
-        String userContinue = scanner.nextLine();
-        if (userContinue.equalsIgnoreCase("n")) {
-            return;
+    public void game() {
+        int lastInt = -1; // * Assigned as negative here to prevent it interfering with first time selection.
+        while (true) {
+            int randomInt = ThreadLocalRandom.current().nextInt(0, countryList.size());
+            int triesLeft = 3;
+            if (randomInt == lastInt) { // * Used to make sure the user doesn't get the same country twice in a row.
+                continue;
+            }
+            lastInt = randomInt;
+            Country randomObj = countryList.get(randomInt);
+            String capitalAnswer = randomObj.getCapital();
+            String countryName = randomObj.getName();
+            while (triesLeft > 0) {
+                triesLeft--; // * Start of a new try, so subtract 1
+                System.out.print("What is the capital of " + countryName + "?: ");
+                String userAnswer = scanner.nextLine();
+                if (userAnswer.equalsIgnoreCase(capitalAnswer)) {
+                    System.out.println("Correct! " + countryName + " is a country with a pop. of "
+                            + randomObj.getPopulation() + " million.");
+                } else if (triesLeft == 0){
+                    System.out.println("Game over! All tries used.");
+                } else {
+                    System.out.println("Wrong.. Try again! (" + triesLeft + " tries remaining)");
+                }
+            }
+            System.out.print("Play again? (Y/N): ");
+            String userContinue = scanner.nextLine();
+            if (userContinue.equalsIgnoreCase("y")) { // * Used y here so anything else is "No"
+                continue;
+            }
+            break;
         }
     }
 }
