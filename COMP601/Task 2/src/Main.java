@@ -1,11 +1,23 @@
+/**------------------------------------------------------------------------
+ * *                                ABOUT
+ * @author         :  Nathan Hines (21523561)
+ * @email          :  nathan@hines.net.nz
+ * @repo           :  github.com/zerrissen/wintec-lib
+ * @description    :  Find the radius, area, and perimeter of a circle.
+ * @pledge         :  I pledge by honour that this program is solely my own work.
+ *------------------------------------------------------------------------**/
+
+/*------------------ IMPORTS -----------------*/
 import java.util.Scanner;
 
-public class App {
+/*------------------ ENTRY POINT -----------------*/
+public class Main {
     public static void main(String[] args) throws Exception {
-        // Define CONSTANTS for formatting.
+        // * Declare format strings as final and use CONSTANT naming convention
         final String STR_FMT = "%-12s%-10s%-10s";
         final String NUM_FMT = "%-11.2f%-10.2f%-10.2f";
         System.out.printf("Enter circle radius: ");
+        // * Get user input and calculate radius, area, perimeter
         Scanner input = new Scanner(System.in);
         try {
             double radius = input.nextDouble();
