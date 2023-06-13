@@ -16,6 +16,6 @@ public class AudioBook extends Book {
     }
 
     public void displayInfo() {
-        System.out.println(getName() + " " + getYear() + " "+ length);
+        System.out.println(getName() + " " + getYear() + " " + length);
     }
 }

@@ -33,12 +33,12 @@ public class Main {
 
     }
 
-    /**==============================================
+     /**==============================================
      **                 getGrade
-     *?  Takes a score and returns a grade based on score
-     *@param score double  
-     *@return char
-     *=============================================**/
+     * ? Takes a score and returns a grade based on score
+     * @param score double
+     * @return char
+     *  =============================================**/
     private static char getGrade(double score) {
         if (score < 50) {
             return 'D';

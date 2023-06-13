@@ -29,7 +29,8 @@ public class GameApp {
     }
 
     public void game() {
-        int lastInt = -1; // * Assigned as negative here to prevent it interfering with first time selection.
+        int lastInt = -1; // * Assigned as negative here to prevent it interfering with first time
+                          // * selection.
         while (true) {
             int randomInt = ThreadLocalRandom.current().nextInt(0, countryList.size());
             int triesLeft = 3;
@@ -48,7 +49,7 @@ public class GameApp {
                     System.out.println("Correct! " + countryName + " is a country with a pop. of "
                             + randomObj.getPopulation() + " million.");
                     break;
-                } else if (triesLeft == 0){
+                } else if (triesLeft == 0) {
                     System.out.println("Game over! All tries used.");
                 } else {
                     System.out.println("Wrong.. Try again! (" + triesLeft + " tries remaining)");

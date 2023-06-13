@@ -7,7 +7,7 @@ public class App {
         try {
             GameApp app = new GameApp(dataFile);
             app.game();
-        } catch(IOException fnf) {
+        } catch (IOException fnf) {
             System.out.printf("File not found!");
         }
     }

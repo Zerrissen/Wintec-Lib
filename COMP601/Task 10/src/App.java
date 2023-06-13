@@ -6,7 +6,7 @@ public class App {
         try {
             AudioBookApp app = new AudioBookApp(txtfile);
             AudioBook shortest = app.getShortestBook();
-            if(shortest != null) {
+            if (shortest != null) {
                 System.out.println("Shortest book:");
                 shortest.displayInfo();
             }
@@ -14,9 +14,9 @@ public class App {
             System.out.printf("Books published btw 2010-2020: %d\n", app.countBooks());
             app.randomBookList();
 
-            }catch(IOException ioe) {
-                System.out.printf("Perhaps missing text file: %s/%s? \n\n",
-                new App().getClass().getPackage().getName(), txtfile);
-            }
+        } catch (IOException ioe) {
+            System.out.printf("Perhaps missing text file: %s/%s? \n\n",
+                    new App().getClass().getPackage().getName(), txtfile);
         }
+    }
 }

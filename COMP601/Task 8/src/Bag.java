@@ -2,7 +2,7 @@ public class Bag {
     private String colour;
     private double capacity;
 
-    //constructor
+    // constructor
     public Bag(String colour, double capacity) {
         setColour(colour);
         setCapacity(capacity);
@@ -19,7 +19,7 @@ public class Bag {
     public String getColour() {
         return colour;
     }
-    
+
     public double getCapacity() {
         return capacity;
     }

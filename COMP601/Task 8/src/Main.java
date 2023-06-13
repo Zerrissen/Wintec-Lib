@@ -9,7 +9,6 @@ public class Main {
         bags.add(new Bag("red", 5.94));
         bags.add(new Bag("white", 9.86));
 
-
         BagApp bgapp = new BagApp();
         double totalCapacity = bgapp.calcTotalCapacity(bags);
         System.out.printf("Total capacity: %.2f\n", totalCapacity);

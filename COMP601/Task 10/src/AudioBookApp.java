@@ -45,7 +45,7 @@ public class AudioBookApp {
         int count = 0;
         for (AudioBook book : bookList) {
             if (book.getYear() > 2010 && book.getYear() < 2020) {
-                count ++;
+                count++;
             }
         }
         return count;
@@ -61,7 +61,7 @@ public class AudioBookApp {
         b3 = new LinkedList<>();
 
         for (AudioBook book : bookList) {
-            int randomInt = ThreadLocalRandom.current().nextInt(1,3);
+            int randomInt = ThreadLocalRandom.current().nextInt(1, 3);
             if (randomInt == 1) {
                 b1.add(book);
             } else if (randomInt == 2) {
