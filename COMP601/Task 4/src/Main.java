@@ -20,9 +20,9 @@ public class Main {
         List<String> list1 = new ArrayList<>();
         List<String> list2 = new ArrayList<>();
 
-        System.out.print("Enter first list of colours: ");
+        System.out.print("Enter first list of colours seperated by comma (,): ");
         String[] list1Value = sc.nextLine().split(",");
-        System.out.print("Enter second list of colours: ");
+        System.out.print("Enter second list of colours seperated by comma (,): ");
         String[] list2Value = sc.nextLine().split(",");
 
         sc.close();
@@ -48,13 +48,16 @@ public class Main {
         }
     }
 
-    /**==============================================
-     **                countDuplicates
+    /**
+     * ==============================================
+     ** countDuplicates
      * ? Iterates the two lists and counts the duplicate items.
+     * 
      * @param List<String> list1
      * @param List<String> list2
      * @return List<String>
-     *=============================================**/
+     *         =============================================
+     **/
     private static List<String> countDuplicates(List<String> list1, List<String> list2) throws Exception {
         List<String> finalList = new ArrayList<>();
         for (int i = 0; i < list1.size(); i++) {
