@@ -47,6 +47,7 @@ public class GameApp {
                 if (userAnswer.equalsIgnoreCase(capitalAnswer)) {
                     System.out.println("Correct! " + countryName + " is a country with a pop. of "
                             + randomObj.getPopulation() + " million.");
+                    break;
                 } else if (triesLeft == 0){
                     System.out.println("Game over! All tries used.");
                 } else {
