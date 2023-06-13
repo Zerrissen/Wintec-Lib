@@ -1,6 +1,17 @@
+/**------------------------------------------------------------------------
+ * *                                ABOUT
+ * @author         :  Nathan Hines (21523561)
+ * @email          :  nathan@hines.net.nz
+ * @repo           :  github.com/zerrissen/wintec-lib
+ * @description    :  Demonstrate polymorphism
+ * @pledge         :  I pledge by honour that this program is solely my own work.
+ *------------------------------------------------------------------------**/
+
+/*------------------ IMPORTS -----------------*/
 import java.util.List;
 import java.util.LinkedList;
 
+/*------------------ ENTRY POINT -----------------*/
 public class Main {
     public static void main(String[] args) {
         List<Shape> shapes = new LinkedList<>();

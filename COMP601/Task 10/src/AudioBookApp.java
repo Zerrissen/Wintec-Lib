@@ -71,15 +71,15 @@ public class AudioBookApp {
             }
         }
 
-        System.out.println("Books in list #1: " + b1.size());
+        System.out.println("\nBooks in list #1: " + b1.size());
         for (AudioBook book : b1) {
             book.displayInfo();
         }
-        System.out.println("Books in list #2: " + b2.size());
+        System.out.println("\nBooks in list #2: " + b2.size());
         for (AudioBook book : b2) {
             book.displayInfo();
         }
-        System.out.println("Books in list #3: " + b3.size());
+        System.out.println("\nBooks in list #3: " + b3.size());
         for (AudioBook book : b3) {
             book.displayInfo();
         }
