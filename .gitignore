@@ -6,3 +6,5 @@ Dockerfile
 
 lib/
 bin/
+
+.prettierrc

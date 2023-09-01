@@ -1,0 +1,6 @@
+Razorbacks,12,T1111,98.6
+Homers,9,T2222,69.5
+Killer Whales,15,T3333,45
+King Fish,10,T4444,95.5
+Monarchs,13,T5555,70
+Stampede,11,T6666,83.5
